@@ -122,11 +122,12 @@
     <!-- EDITOR DE PROVA -->
     <div id="editor" style="display:none;">
       
+      <!-- CARD DADOS DA PROVA (Inicia recuado) -->
       <div class="card">
         <div class="card-titulo" id="tituloDados" onclick="alternarCard('dadosProva','tituloDados','📄 Dados da Prova')">
-          📄 Dados da Prova ▼
+          📄 Dados da Prova ▶
         </div>
-        <div class="card-conteudo" id="dadosProva">
+        <div class="card-conteudo" id="dadosProva" style="display:none;">
           <div class="editor">
             <label for="tituloProva">Título da Prova</label>
             <input type="text" id="tituloProva" placeholder="Ex: AVALIAÇÃO DE FÍSICA">
@@ -151,11 +152,12 @@
         </div>
       </div>
 
+      <!-- CARD NOVA QUESTÃO / EDIÇÃO (Inicia recuado) -->
       <div class="card">
         <div class="card-titulo" id="tituloQuestao" onclick="alternarCard('novaQuestao','tituloQuestao','➕ Nova Questão / Edição')">
-          ➕ Nova Questão / Edição ▼
+          ➕ Nova Questão / Edição ▶
         </div>
-        <div class="card-conteudo" id="novaQuestao">
+        <div class="card-conteudo" id="novaQuestao" style="display:none;">
           <div class="editor">
             <label for="titulo">Título / Número da Questão</label>
             <input type="text" id="titulo" placeholder="Ex: Questão 1">
@@ -225,6 +227,7 @@
               </label>
             </div>
 
+            <!-- BOTÃO DE SALVAR/ADICIONAR QUESTÃO -->
             <div id="container-btn-salvar">
               <button class="btn" id="btnSalvarQuestao" style="background:#1b365d; color:white; width:100%; padding: 12px; font-size: 11pt;" onclick="adicionarOuSalvarQuestao()">
                 ➕ Adicionar Questão
@@ -234,6 +237,14 @@
         </div>
       </div>
 
+      <!-- BOTÃO VOLTAR AO MENU (POSICIONADO ENTRE OS DOIS CARDS) -->
+      <div style="width: 210mm; max-width: 95%; margin: 0 auto 18px auto;">
+        <button class="btn" style="background:#1b365d; color:white; width:100%; padding: 14px; font-size: 11pt; border-radius: 10px;" onclick="voltarMenu()">
+          ⬅ Voltar ao Menu
+        </button>
+      </div>
+
+      <!-- CARD QUESTÕES ADICIONADAS -->
       <div class="card">
         <div class="card-titulo">📋 Questões Adicionadas</div>
         <div class="card-conteudo">
@@ -275,7 +286,6 @@
       document.getElementById("menuPrincipal").style.display = "block";
       document.getElementById("editor").style.display = "none";
     }
-
     function abrirNovaProva() {
       provaAtualId = Date.now();
       questoesArray = [];
@@ -284,6 +294,14 @@
       document.getElementById("professor").value = "";
       document.getElementById("turma").value = "";
       document.getElementById("data").value = "";
+
+      // Inicia com cards de formulário recuados/fechados
+      document.getElementById("dadosProva").style.display = "none";
+      document.getElementById("tituloDados").innerHTML = "📄 Dados da Prova ▶";
+
+      document.getElementById("novaQuestao").style.display = "none";
+      document.getElementById("tituloQuestao").innerHTML = "➕ Nova Questão / Edição ▶";
+
       renderizarListaEditor();
       paginarDocumento();
       
@@ -292,6 +310,9 @@
     }
 
     function voltarMenu() {
+      if (questaoEmEdicaoId !== null) {
+        cancelarEdicao();
+      }
       document.getElementById("editor").style.display = "none";
       document.getElementById("bancoQuestoes").style.display = "none";
       document.getElementById("provasSalvas").style.display = "none";
@@ -335,6 +356,18 @@
       }
     }
 
+    function alternarCard(id, titulo, texto) {
+      let card = document.getElementById(id);
+      let t = document.getElementById(titulo);
+      if (card.style.display === "none") {
+        card.style.display = "block";
+        t.innerHTML = texto + " ▼";
+      } else {
+        card.style.display = "none";
+        t.innerHTML = texto + " ▶";
+      }
+    }
+
     function alternarCamposTipo() {
       let tipo = document.getElementById("tipo").value;
       document.getElementById("secaoMultiplaEscolha").style.display = tipo === "multipla" ? "block" : "none";
@@ -344,7 +377,7 @@
       document.getElementById("secaoLinhas").style.display = tipo === "dissertativa" ? "block" : "none";
     }
 
-    function adicionarOuSalvarQuestao() {
+   function adicionarOuSalvarQuestao() {
       let titulo = document.getElementById("titulo").value || "Questão";
       let enunciado = document.getElementById("enunciado").value;
       let tipo = document.getElementById("tipo").value;
@@ -493,8 +526,7 @@
         `;
         lista.appendChild(item);
       });
-    }
-
+                }
     function excluirQuestao(id) {
       if (confirm("Deseja realmente excluir esta questão da prova?")) {
         if (questaoEmEdicaoId === id) cancelarEdicao();
@@ -506,9 +538,13 @@
 
     /* ARMAZENAMENTO LOCAL */
     function salvarProvaAtual() {
+      if (!provaAtualId) {
+        provaAtualId = Date.now();
+      }
+
       let titulo = document.getElementById("tituloProva").value.trim() || "Prova sem título";
       let provaData = {
-        id: provaAtualId || Date.now(),
+        id: provaAtualId,
         titulo: titulo,
         disciplina: document.getElementById("disciplina").value,
         professor: document.getElementById("professor").value,
@@ -527,9 +563,8 @@
       }
 
       localStorage.setItem("provasSalvas", JSON.stringify(provasSalvas));
-      alert("Prova salva com sucesso no seu dispositivo!");
+      alert("✅ Prova '" + titulo + "' salva com sucesso no dispositivo!");
     }
-
     function renderizarProvasSalvas() {
       let lista = document.getElementById("listaProvasSalvas");
       let provasSalvas = JSON.parse(localStorage.getItem("provasSalvas") || "[]");
@@ -613,7 +648,7 @@
         div.innerHTML = `
           <div>
             <strong>${q.titulo}</strong> - <small>${q.tipo}</small><br>
-            <small style="color:#666;">${q.enunciado.substring(0, 50)}...</small>
+            <small style="color:#666;">${q.enunciado ? q.enunciado.substring(0, 50) : ''}...</small>
           </div>
           <div>
             <button class="btn" style="background:#2b6cb0; color:white;" onclick="importarQuestaoParaProva(${q.id})">➕ Importar p/ Prova</button>
@@ -629,11 +664,22 @@
       let q = banco.find(item => item.id === id);
       if (!q) return;
 
+      if (!provaAtualId) {
+        provaAtualId = Date.now();
+      }
+
       let novaQuestao = JSON.parse(JSON.stringify(q));
       novaQuestao.id = Date.now();
       questoesArray.push(novaQuestao);
 
-      alert("Questão importada com sucesso para a prova atual!");
+      renderizarListaEditor();
+      paginarDocumento();
+
+      // Transfere diretamente o usuário para a área do editor para visualizar
+      document.getElementById("bancoQuestoes").style.display = "none";
+      document.getElementById("editor").style.display = "block";
+
+      alert(" Questão importada com sucesso! Você foi redirecionado para o Editor de Prova.");
     }
 
     function excluirQuestaoBanco(id) {
@@ -844,7 +890,6 @@
       btn.innerText = "⏳ Gerando PDF...";
       btn.disabled = true;
 
-      // Reseta escala de tela para a captura exata das folhas A4
       const paginas = document.querySelectorAll(".a4-page");
       paginas.forEach(p => p.style.zoom = "1");
 
