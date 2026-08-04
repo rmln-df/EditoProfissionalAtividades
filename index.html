@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prova IA - Editor Profissional</title>
+
+  <!-- BIBLIOTECA PARA GERAR PDF DIRETO NO CELULAR -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body { font-family: Arial, sans-serif; background-color: #525659; margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+    .controls { position: fixed; top: 0; left: 0; right: 0; z-index: 10000; width: 100%; height: 60px; display: flex; align-items: center; justify-content: center; gap: 12px; padding: 0 15px; background: #1b365d; color: white; box-shadow: 0 3px 10px rgba(0,0,0,0.3); }
+    .btn { background-color: #ffffff; color: #1b365d; border: none; padding: 8px 14px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 9pt; transition: background 0.2s; }
+    .btn:hover { background-color: #e2e8f0; }
+    .btn:disabled { background-color: #a0aec0; color: #666; cursor: not-allowed; }
+    .btn-edit { background-color: #d69e2e; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 8pt; margin-right: 5px; }
+    .btn-delete { background-color: #c53030; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 8pt; }
+    .page-scaler { width: 100%; margin-top: 70px; padding: 20px 0 50px 0; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; }
+    #documento-paginado { display: flex; flex-direction: column; align-items: center; gap: 30px; width: 100%; }
+    .a4-page { width: 210mm; height: 297mm; padding: 12mm; background: #ffffff; display: flex; flex-direction: column; box-shadow: 0 8px 20px rgba(0,0,0,0.4); position: relative; overflow: hidden; box-sizing: border-box; margin: 0 auto; }
+    .header-bar { background-color: #1b365d; color: #ffffff; text-align: center; padding: 8px 10px; border-radius: 2px; margin-bottom: 10px; flex-shrink: 0; }
+    .header-bar h1 { margin: 0; font-size: 11pt; text-transform: uppercase; }
+    .header-bar p { margin: 2px 0 0 0; font-size: 8pt; }
+    .student-info { width: 100%; margin-bottom: 10px; border-bottom: 1.5px solid #1b365d; padding-bottom: 6px; font-size: 8.5pt; flex-shrink: 0; }
+    .student-info table { width: 100%; border-collapse: collapse; }
+    .continuation-bar { font-size: 8pt; color: #555; display: flex; justify-content: space-between; border-bottom: 1px solid #ccc; padding-bottom: 4px; margin-bottom: 10px; flex-shrink: 0; }
+    .columns-container { column-count: 2; column-gap: 24px; column-rule: 1px solid #000000; width: 100%; overflow: hidden; }
+    .questao { margin-bottom: 14px; font-size: 9.5pt; line-height: 1.35; text-align: justify; break-inside: avoid; }
+    .questao-titulo { font-weight: bold; color: #1b365d; margin-bottom: 4px; border-left: 3px solid #2b6cb0; padding-left: 5px; break-after: avoid; }
+    
+    .editor { background: white; padding: 15px; border-radius: 8px; width: 100%; margin-bottom: 15px; }
+    .editor label { display: block; font-weight: bold; color: #1b365d; margin-top: 10px; margin-bottom: 4px; font-size: 9.5pt; }
+    .editor input, .editor textarea, .editor select { width: 100%; padding: 10px; margin-bottom: 12px; border: 1px solid #cbd5e0; border-radius: 6px; font-size: 9.5pt; background-color: #f8fafc; transition: border-color 0.2s, background-color 0.2s; }
+    .editor input:focus, .editor textarea:focus, .editor select:focus { outline: none; border-color: #2b6cb0; background-color: #ffffff; }
+    .editor textarea { height: 100px; resize: vertical; }
+    #telaInicial { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg,#1b365d,#2b6cb0); display: flex; flex-direction: column; justify-content: center; align-items: center; color: white; z-index: 99999; }
+    #telaInicial h1 { font-size: clamp(30px,7vw,50px); margin-bottom: 10px; text-align: center; }
+    #telaInicial h2 { font-size: clamp(16px,4vw,22px); font-weight: normal; margin-bottom: 25px; text-align: center; }
+    #telaInicial button { width: 85%; max-width: 320px; padding: 16px; font-size: clamp(18px,4vw,22px); border: none; border-radius: 12px; cursor: pointer; background: white; color: #1b365d; font-weight: bold; }
+    #menuPrincipal { width: 210mm; max-width: 95%; margin: 30px auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,.15); }
+    #menuPrincipal h2 { text-align: center; color: #1b365d; margin-bottom: 10px; }
+    #menuPrincipal p { text-align: center; margin-bottom: 25px; color: #666; }
+    #menuPrincipal button { width: 100%; padding: 15px; margin-bottom: 12px; font-size: 18px; border: none; border-radius: 10px; background: #1b365d; color: white; cursor: pointer; transition: .3s; }
+    #menuPrincipal button:hover { background: #2b6cb0; }
+    .card { background: #fff; margin: 18px auto; border-radius: 14px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,.15); width: 210mm; max-width: 95%; }
+    .card-titulo { background: #1b365d; color: #fff; padding: 15px; font-size: 20px; font-weight: bold; cursor: pointer; }
+    .card-conteudo { padding: 20px; }
+    .item-salvo { border: 1px solid #e2e8f0; padding: 12px; border-radius: 8px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; background: #f8fafc; }
+    
+    @media(max-width: 768px) {
+      .card, #menuPrincipal { width: 95%; margin: 10px auto; border-radius: 10px; }
+      .controls { flex-wrap: wrap; height: auto; padding: 8px; }
+      .page-scaler { margin-top: 100px; }
+      .card-conteudo { padding: 12px; }
+      .editor { padding: 10px; }
+      .btn { flex: 1; min-width: 90px; }
+      .item-salvo { flex-direction: column; align-items: flex-start; gap: 10px; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div id="telaInicial">
+    <h1>📚 PROVA AI</h1>
+    <h2>Editor Profissional de Atividades</h2>
+    <p>Versão 1.0</p>
+    <button onclick="abrirSistema()">Entrar</button>
+  </div>
+
+  <div id="sistema" style="display:none; width: 100%;">
+
+    <div id="menuPrincipal">
+      <h2>📚 GABARITA AI</h2>
+      <p>Editor Profissional de Avaliações</p>
+      <button onclick="abrirNovaProva()">📄 Nova Prova</button>
+      <button onclick="abrirBancoQuestoes()">📚 Banco de Questões</button>
+      <button onclick="abrirProvasSalvas()">💾 Provas Salvas</button>
+      <button onclick="abrirConfiguracoes()">⚙ Configurações</button>
+      <button onclick="voltarInicio()">❌ Sair</button>
+    </div>
+
+    <!-- BANCO DE QUESTÕES -->
+    <div id="bancoQuestoes" style="display:none;">
+      <div class="card">
+        <div class="card-titulo">📚 Banco de Questões (Salvas no Aparelho)</div>
+        <div class="card-conteudo">
+          <div id="listaBancoQuestoes"></div>
+          <button onclick="voltarMenu()" class="btn" style="background:#1b365d; color:white; width: 100%; padding: 12px; margin-top: 15px;">⬅ Voltar ao Menu</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PROVAS SALVAS -->
+    <div id="provasSalvas" style="display:none;">
+      <div class="card">
+        <div class="card-titulo">💾 Provas Salvas no Dispositivo</div>
+        <div class="card-conteudo">
+          <div id="listaProvasSalvas"></div>
+          <button onclick="voltarMenu()" class="btn" style="background:#1b365d; color:white; width: 100%; padding: 12px; margin-top: 15px;">⬅ Voltar ao Menu</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONFIGURAÇÕES -->
+    <div id="configuracoes" style="display:none;">
+      <div class="card">
+        <div class="card-titulo">⚙ Configurações e Backup</div>
+        <div class="card-conteudo">
+          <p><strong>Gerenciar Dados do Dispositivo:</strong></p>
+          <button class="btn" style="background:#2b6cb0; color:white; width:100%; padding:12px; margin-bottom:10px;" onclick="exportarBackup()">📥 Baixar Backup das Provas (JSON)</button>
+          <input type="file" id="importarFile" accept=".json" style="display:none;" onchange="importarBackup(event)">
+          <button class="btn" style="background:#d69e2e; color:white; width:100%; padding:12px; margin-bottom:10px;" onclick="document.getElementById('importarFile').click()">📤 Importar Backup (JSON)</button>
+          <button class="btn" style="background:#c53030; color:white; width:100%; padding:12px; margin-bottom:10px;" onclick="limparTudo()">🗑 Limpar Todos os Dados Salvos</button>
+          <button onclick="voltarMenu()" class="btn" style="background:#1b365d; color:white; width: 100%; padding: 12px; margin-top: 15px;">⬅ Voltar ao Menu</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- EDITOR DE PROVA -->
+    <div id="editor" style="display:none;">
+      
+      <div class="card">
+        <div class="card-titulo" id="tituloDados" onclick="alternarCard('dadosProva','tituloDados','📄 Dados da Prova')">
+          📄 Dados da Prova ▼
+        </div>
+        <div class="card-conteudo" id="dadosProva">
+          <div class="editor">
+            <label for="tituloProva">Título da Prova</label>
+            <input type="text" id="tituloProva" placeholder="Ex: AVALIAÇÃO DE FÍSICA">
+
+            <label for="disciplina">Disciplina</label>
+            <input type="text" id="disciplina" placeholder="Ex: Física">
+
+            <label for="professor">Professor(a)</label>
+            <input type="text" id="professor" placeholder="Nome do professor">
+
+            <label for="turma">Turma</label>
+            <input type="text" id="turma" placeholder="Ex: 1º Ano A">
+
+            <label for="data">Data</label>
+            <input type="date" id="data">
+
+            <div style="display: flex; gap: 10px; margin-top: 10px;">
+              <button class="btn" style="background:#1b365d; color:white; flex:1; padding:12px;" onclick="paginarDocumento()">💾 Atualizar Cabeçalho</button>
+              <button class="btn" style="background:#2b6cb0; color:white; flex:1; padding:12px;" onclick="salvarProvaAtual()">💾 Salvar Prova no Dispositivo</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-titulo" id="tituloQuestao" onclick="alternarCard('novaQuestao','tituloQuestao','➕ Nova Questão / Edição')">
+          ➕ Nova Questão / Edição ▼
+        </div>
+        <div class="card-conteudo" id="novaQuestao">
+          <div class="editor">
+            <label for="titulo">Título / Número da Questão</label>
+            <input type="text" id="titulo" placeholder="Ex: Questão 1">
+
+            <label for="tipo">Tipo de Questão</label>
+            <select id="tipo" onchange="alternarCamposTipo()">
+              <option value="dissertativa">Dissertativa</option>
+              <option value="multipla">Múltipla Escolha</option>
+              <option value="ce">Certo ou Errado</option>
+              <option value="vf">Verdadeiro ou Falso</option>
+            </select>
+
+            <label for="enunciado">Enunciado</label>
+            <textarea id="enunciado" placeholder="Digite o texto da questão..."></textarea>
+
+            <div id="secaoMultiplaEscolha" style="display:none; border: 1px solid #2b6cb0; padding: 12px; border-radius: 6px; margin-bottom: 12px; background: #edf2f7;">
+              <strong style="color: #1b365d;">Alternativas:</strong>
+              <label for="altA">A)</label><input type="text" id="altA">
+              <label for="altB">B)</label><input type="text" id="altB">
+              <label for="altC">C)</label><input type="text" id="altC">
+              <label for="altD">D)</label><input type="text" id="altD">
+              <label for="altE">E)</label><input type="text" id="altE">
+              <label for="corretaMultipla">Alternativa Correta</label>
+              <select id="corretaMultipla">
+                <option value="">Selecione...</option>
+                <option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option><option value="E">E</option>
+              </select>
+            </div>
+
+            <div id="secaoCertoErrado" style="display:none; border: 1px solid #2b6cb0; padding: 12px; border-radius: 6px; margin-bottom: 12px; background: #edf2f7;">
+              <label for="respostaCE">Gabarito</label>
+              <select id="respostaCE">
+                <option value="">Selecione...</option>
+                <option value="CERTO">CERTO</option>
+                <option value="ERRADO">ERRADO</option>
+              </select>
+            </div>
+
+            <div id="secaoVerdadeiroFalso" style="display:none; border: 1px solid #2b6cb0; padding: 12px; border-radius: 6px; margin-bottom: 12px; background: #edf2f7;">
+              <label for="respostaVF">Gabarito</label>
+              <select id="respostaVF">
+                <option value="">Selecione...</option>
+                <option value="VERDADEIRO">VERDADEIRO</option>
+                <option value="FALSO">FALSO</option>
+              </select>
+            </div>
+
+            <div id="secaoGabaritoTexto">
+              <label for="gabarito">Gabarito (Opcional)</label>
+              <textarea id="gabarito"></textarea>
+            </div>
+
+            <div id="secaoLinhas">
+              <label for="espaco">Linhas para Resposta</label>
+              <select id="espaco">
+                <option value="0">Sem linhas</option>
+                <option value="2">2 linhas</option>
+                <option value="3">3 linhas</option>
+                <option value="5">5 linhas</option>
+                <option value="10">10 linhas</option>
+              </select>
+            </div>
+
+            <div style="margin-top: 5px; margin-bottom: 15px;">
+              <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: normal;">
+                <input type="checkbox" id="calculo" style="width: auto; margin: 0;"> Incluir campo para cálculos
+              </label>
+            </div>
+
+            <div id="container-btn-salvar">
+              <button class="btn" id="btnSalvarQuestao" style="background:#1b365d; color:white; width:100%; padding: 12px; font-size: 11pt;" onclick="adicionarOuSalvarQuestao()">
+                ➕ Adicionar Questão
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-titulo">📋 Questões Adicionadas</div>
+        <div class="card-conteudo">
+          <div id="listaQuestoes"><p style="color:#777;text-align:center;">Nenhuma questão adicionada.</p></div>
+          <button onclick="abrirVisualizacao()" style="width:100%; margin-top:15px; padding:15px; font-size:18px; background:#2b6cb0; color:white; border:none; border-radius:10px; cursor:pointer; font-weight:bold;">
+            👁 Visualizar Folhas (Estilo Word)
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- VISUALIZAÇÃO -->
+    <div id="visualizacaoProva" style="display:none; width: 100%;">
+      <div class="controls">
+        <button class="btn" onclick="fecharVisualizacao()">← Voltar ao Editor</button>
+        <button class="btn" id="btn-prev" onclick="irParaPagina(paginaAtual - 1)">← Anterior</button>
+        <span id="page-indicator" style="font-size: 9pt; font-weight: bold;">Folha 1 de 1</span>
+        <button class="btn" id="btn-next" onclick="irParaPagina(paginaAtual + 1)">Próxima →</button>
+        <button class="btn" id="btnDownloadPDF" style="background-color: #2b6cb0; color:white;" onclick="gerarPDFDireto()">📥 Baixar PDF</button>
+      </div>
+
+      <div class="page-scaler">
+        <div id="documento-paginado"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    let paginaAtual = 0;
+    let questoesArray = [];
+    let questaoEmEdicaoId = null;
+    let provaAtualId = null;
+
+    function abrirSistema() {
+      document.getElementById("telaInicial").style.display = "none";
+      document.getElementById("sistema").style.display = "block";
+      document.getElementById("menuPrincipal").style.display = "block";
+      document.getElementById("editor").style.display = "none";
+    }
+
+    function abrirNovaProva() {
+      provaAtualId = Date.now();
+      questoesArray = [];
+      document.getElementById("tituloProva").value = "";
+      document.getElementById("disciplina").value = "";
+      document.getElementById("professor").value = "";
+      document.getElementById("turma").value = "";
+      document.getElementById("data").value = "";
+      renderizarListaEditor();
+      paginarDocumento();
+      
+      document.getElementById("menuPrincipal").style.display = "none";
+      document.getElementById("editor").style.display = "block";
+    }
+
+    function voltarMenu() {
+      document.getElementById("editor").style.display = "none";
+      document.getElementById("bancoQuestoes").style.display = "none";
+      document.getElementById("provasSalvas").style.display = "none";
+      document.getElementById("configuracoes").style.display = "none";
+      document.getElementById("menuPrincipal").style.display = "block";
+    }
+
+    function voltarInicio() {
+      document.getElementById("telaInicial").style.display = "flex";
+      document.getElementById("sistema").style.display = "none";
+      document.getElementById("menuPrincipal").style.display = "block";
+      document.getElementById("editor").style.display = "none";
+    }
+
+    function abrirBancoQuestoes() {
+      renderizarBancoQuestoes();
+      document.getElementById("menuPrincipal").style.display = "none";
+      document.getElementById("bancoQuestoes").style.display = "block";
+    }
+
+    function abrirProvasSalvas() {
+      renderizarProvasSalvas();
+      document.getElementById("menuPrincipal").style.display = "none";
+      document.getElementById("provasSalvas").style.display = "block";
+    }
+
+    function abrirConfiguracoes() {
+      document.getElementById("menuPrincipal").style.display = "none";
+      document.getElementById("configuracoes").style.display = "block";
+    }
+
+    function alternarCard(id, titulo, texto) {
+      let card = document.getElementById(id);
+      let t = document.getElementById(titulo);
+      if (card.style.display === "none") {
+        card.style.display = "block";
+        t.innerHTML = texto + " ▼";
+      } else {
+        card.style.display = "none";
+        t.innerHTML = texto + " ▶";
+      }
+    }
+
+    function alternarCamposTipo() {
+      let tipo = document.getElementById("tipo").value;
+      document.getElementById("secaoMultiplaEscolha").style.display = tipo === "multipla" ? "block" : "none";
+      document.getElementById("secaoCertoErrado").style.display = tipo === "ce" ? "block" : "none";
+      document.getElementById("secaoVerdadeiroFalso").style.display = tipo === "vf" ? "block" : "none";
+      document.getElementById("secaoGabaritoTexto").style.display = tipo === "dissertativa" ? "block" : "none";
+      document.getElementById("secaoLinhas").style.display = tipo === "dissertativa" ? "block" : "none";
+    }
+
+    function adicionarOuSalvarQuestao() {
+      let titulo = document.getElementById("titulo").value || "Questão";
+      let enunciado = document.getElementById("enunciado").value;
+      let tipo = document.getElementById("tipo").value;
+      let gabarito = document.getElementById("gabarito").value;
+      let espaco = document.getElementById("espaco").value;
+      let calculo = document.getElementById("calculo").checked;
+
+      let altA = document.getElementById("altA").value;
+      let altB = document.getElementById("altB").value;
+      let altC = document.getElementById("altC").value;
+      let altD = document.getElementById("altD").value;
+      let altE = document.getElementById("altE").value;
+      let corretaMultipla = document.getElementById("corretaMultipla").value;
+      let respostaCE = document.getElementById("respostaCE").value;
+      let respostaVF = document.getElementById("respostaVF").value;
+
+      let html = `<div class='questao-titulo'>${titulo}</div><p>${enunciado}</p>`;
+
+      if (tipo === "multipla") {
+        html += `<p>A) ( ) ${altA}</p><p>B) ( ) ${altB}</p><p>C) ( ) ${altC}</p><p>D) ( ) ${altD}</p><p>E) ( ) ${altE}</p>`;
+        if (corretaMultipla) gabarito = "Alternativa " + corretaMultipla;
+      } else if (tipo === "ce") {
+        html += "<p>CERTO ( ) &nbsp;&nbsp; ERRADO ( )</p>";
+        if (respostaCE) gabarito = respostaCE;
+      } else if (tipo === "vf") {
+        html += "<p>VERDADEIRO ( ) &nbsp;&nbsp; FALSO ( )</p>";
+        if (respostaVF) gabarito = respostaVF;
+      }
+
+      if (tipo === "dissertativa") {
+        let linhas = parseInt(espaco);
+        for (let i = 0; i < linhas; i++) {
+          html += "<div style='border-bottom:1px solid #999;height:22px'></div>";
+        }
+      }
+
+      if (calculo) {
+        html += "<br><strong>Cálculos:</strong><div style='height:140px;border:1px dashed #444;margin-top:5px'></div>";
+      }
+
+      let dadosQuestao = {
+        id: questaoEmEdicaoId !== null ? questaoEmEdicaoId : Date.now(),
+        titulo, enunciado, tipo, gabarito, espaco, calculo,
+        altA, altB, altC, altD, altE, corretaMultipla, respostaCE, respostaVF,
+        htmlContent: html
+      };
+
+      if (questaoEmEdicaoId !== null) {
+        let index = questoesArray.findIndex(q => q.id === questaoEmEdicaoId);
+        if (index !== -1) questoesArray[index] = dadosQuestao;
+        cancelarEdicao();
+      } else {
+        questoesArray.push(dadosQuestao);
+        limparFormulario();
+      }
+
+      salvarQuestaoNoBanco(dadosQuestao);
+      renderizarListaEditor();
+      paginarDocumento();
+    }
+
+    function editarQuestao(id) {
+      let q = questoesArray.find(item => item.id === id);
+      if (!q) return;
+
+      questaoEmEdicaoId = id;
+      document.getElementById("titulo").value = q.titulo || "";
+      document.getElementById("enunciado").value = q.enunciado || "";
+      document.getElementById("tipo").value = q.tipo || "dissertativa";
+      document.getElementById("gabarito").value = q.gabarito || "";
+      document.getElementById("espaco").value = q.espaco || "0";
+      document.getElementById("calculo").checked = !!q.calculo;
+      document.getElementById("altA").value = q.altA || "";
+      document.getElementById("altB").value = q.altB || "";
+      document.getElementById("altC").value = q.altC || "";
+      document.getElementById("altD").value = q.altD || "";
+      document.getElementById("altE").value = q.altE || "";
+      document.getElementById("corretaMultipla").value = q.corretaMultipla || "";
+      document.getElementById("respostaCE").value = q.respostaCE || "";
+      document.getElementById("respostaVF").value = q.respostaVF || "";
+
+      alternarCamposTipo();
+
+      let card = document.getElementById("novaQuestao");
+      if (card.style.display === "none") alternarCard('novaQuestao','tituloQuestao','➕ Nova Questão / Edição');
+
+      document.getElementById("container-btn-salvar").innerHTML = `
+        <div style="display:flex; gap:10px;">
+          <button class="btn" style="background:#2b6cb0; color:white; flex:1; padding:12px;" onclick="adicionarOuSalvarQuestao()">💾 Salvar Alterações</button>
+          <button class="btn" style="background:#718096; color:white; flex:1; padding:12px;" onclick="cancelarEdicao()">❌ Cancelar</button>
+        </div>
+      `;
+
+      document.getElementById("novaQuestao").scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function cancelarEdicao() {
+      questaoEmEdicaoId = null;
+      limparFormulario();
+      document.getElementById("container-btn-salvar").innerHTML = `
+        <button class="btn" id="btnSalvarQuestao" style="background:#1b365d; color:white; width:100%; padding: 12px; font-size: 11pt;" onclick="adicionarOuSalvarQuestao()">
+          ➕ Adicionar Questão
+        </button>
+      `;
+    }
+
+    function limparFormulario() {
+      document.getElementById("titulo").value = "";
+      document.getElementById("enunciado").value = "";
+      document.getElementById("gabarito").value = "";
+      document.getElementById("espaco").value = "0";
+      document.getElementById("calculo").checked = false;
+      document.getElementById("altA").value = "";
+      document.getElementById("altB").value = "";
+      document.getElementById("altC").value = "";
+      document.getElementById("altD").value = "";
+      document.getElementById("altE").value = "";
+      document.getElementById("corretaMultipla").value = "";
+      document.getElementById("respostaCE").value = "";
+      document.getElementById("respostaVF").value = "";
+      alternarCamposTipo();
+    }
+
+    function renderizarListaEditor() {
+      let lista = document.getElementById("listaQuestoes");
+      if (questoesArray.length === 0) {
+        lista.innerHTML = '<p style="color:#777;text-align:center;">Nenhuma questão adicionada.</p>';
+        return;
+      }
+      lista.innerHTML = "";
+      questoesArray.forEach(q => {
+        let item = document.createElement("div");
+        item.style.borderBottom = "1px solid #ddd";
+        item.style.padding = "10px 0";
+        item.innerHTML = `
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <div>
+              <strong>${q.titulo}</strong><br>
+              <small style="color:#666;">Tipo: ${q.tipo}</small>
+            </div>
+            <div>
+              <button class="btn-edit" onclick="editarQuestao(${q.id})">✏️ Editar</button>
+              <button class="btn-delete" onclick="excluirQuestao(${q.id})">🗑 Excluir</button>
+            </div>
+          </div>
+        `;
+        lista.appendChild(item);
+      });
+    }
+
+    function excluirQuestao(id) {
+      if (confirm("Deseja realmente excluir esta questão da prova?")) {
+        if (questaoEmEdicaoId === id) cancelarEdicao();
+        questoesArray = questoesArray.filter(q => q.id !== id);
+        renderizarListaEditor();
+        paginarDocumento();
+      }
+    }
+
+    /* ARMAZENAMENTO LOCAL */
+    function salvarProvaAtual() {
+      let titulo = document.getElementById("tituloProva").value.trim() || "Prova sem título";
+      let provaData = {
+        id: provaAtualId || Date.now(),
+        titulo: titulo,
+        disciplina: document.getElementById("disciplina").value,
+        professor: document.getElementById("professor").value,
+        turma: document.getElementById("turma").value,
+        data: document.getElementById("data").value,
+        questoes: questoesArray
+      };
+
+      let provasSalvas = JSON.parse(localStorage.getItem("provasSalvas") || "[]");
+      let index = provasSalvas.findIndex(p => p.id === provaData.id);
+      
+      if (index !== -1) {
+        provasSalvas[index] = provaData;
+      } else {
+        provasSalvas.push(provaData);
+      }
+
+      localStorage.setItem("provasSalvas", JSON.stringify(provasSalvas));
+      alert("Prova salva com sucesso no seu dispositivo!");
+    }
+
+    function renderizarProvasSalvas() {
+      let lista = document.getElementById("listaProvasSalvas");
+      let provasSalvas = JSON.parse(localStorage.getItem("provasSalvas") || "[]");
+
+      if (provasSalvas.length === 0) {
+        lista.innerHTML = "<p style='text-align:center; color:#666;'>Nenhuma prova salva neste dispositivo.</p>";
+        return;
+      }
+
+      lista.innerHTML = "";
+      provasSalvas.forEach(prova => {
+        let div = document.createElement("div");
+        div.className = "item-salvo";
+        div.innerHTML = `
+          <div>
+            <strong>${prova.titulo}</strong> (${prova.disciplina || 'Geral'})<br>
+            <small style="color:#666;">${prova.questoes.length} questão(ões)</small>
+          </div>
+          <div>
+            <button class="btn" style="background:#2b6cb0; color:white;" onclick="carregarProva(${prova.id})">📂 Abrir</button>
+            <button class="btn-delete" onclick="excluirProvaSalva(${prova.id})">🗑 Excluir</button>
+          </div>
+        `;
+        lista.appendChild(div);
+      });
+    }
+
+    function carregarProva(id) {
+      let provasSalvas = JSON.parse(localStorage.getItem("provasSalvas") || "[]");
+      let prova = provasSalvas.find(p => p.id === id);
+      if (!prova) return;
+
+      provaAtualId = prova.id;
+      document.getElementById("tituloProva").value = prova.titulo || "";
+      document.getElementById("disciplina").value = prova.disciplina || "";
+      document.getElementById("professor").value = prova.professor || "";
+      document.getElementById("turma").value = prova.turma || "";
+      document.getElementById("data").value = prova.data || "";
+      questoesArray = prova.questoes || [];
+
+      renderizarListaEditor();
+      paginarDocumento();
+
+      document.getElementById("provasSalvas").style.display = "none";
+      document.getElementById("editor").style.display = "block";
+    }
+
+    function excluirProvaSalva(id) {
+      if (confirm("Deseja realmente apagar esta prova do dispositivo?")) {
+        let provasSalvas = JSON.parse(localStorage.getItem("provasSalvas") || "[]");
+        provasSalvas = provasSalvas.filter(p => p.id !== id);
+        localStorage.setItem("provasSalvas", JSON.stringify(provasSalvas));
+        renderizarProvasSalvas();
+      }
+    }
+
+    function salvarQuestaoNoBanco(questao) {
+      let banco = JSON.parse(localStorage.getItem("bancoQuestoes") || "[]");
+      let index = banco.findIndex(q => q.id === questao.id);
+      if (index !== -1) {
+        banco[index] = questao;
+      } else {
+        banco.push(questao);
+      }
+      localStorage.setItem("bancoQuestoes", JSON.stringify(banco));
+    }
+
+    function renderizarBancoQuestoes() {
+      let lista = document.getElementById("listaBancoQuestoes");
+      let banco = JSON.parse(localStorage.getItem("bancoQuestoes") || "[]");
+
+      if (banco.length === 0) {
+        lista.innerHTML = "<p style='text-align:center; color:#666;'>Nenhuma questão salva no banco.</p>";
+        return;
+      }
+
+      lista.innerHTML = "";
+      banco.forEach(q => {
+        let div = document.createElement("div");
+        div.className = "item-salvo";
+        div.innerHTML = `
+          <div>
+            <strong>${q.titulo}</strong> - <small>${q.tipo}</small><br>
+            <small style="color:#666;">${q.enunciado.substring(0, 50)}...</small>
+          </div>
+          <div>
+            <button class="btn" style="background:#2b6cb0; color:white;" onclick="importarQuestaoParaProva(${q.id})">➕ Importar p/ Prova</button>
+            <button class="btn-delete" onclick="excluirQuestaoBanco(${q.id})">🗑 Excluir</button>
+          </div>
+        `;
+        lista.appendChild(div);
+      });
+    }
+
+    function importarQuestaoParaProva(id) {
+      let banco = JSON.parse(localStorage.getItem("bancoQuestoes") || "[]");
+      let q = banco.find(item => item.id === id);
+      if (!q) return;
+
+      let novaQuestao = JSON.parse(JSON.stringify(q));
+      novaQuestao.id = Date.now();
+      questoesArray.push(novaQuestao);
+
+      alert("Questão importada com sucesso para a prova atual!");
+    }
+
+    function excluirQuestaoBanco(id) {
+      if (confirm("Remover esta questão do banco de dados local?")) {
+        let banco = JSON.parse(localStorage.getItem("bancoQuestoes") || "[]");
+        banco = banco.filter(q => q.id !== id);
+        localStorage.setItem("bancoQuestoes", JSON.stringify(banco));
+        renderizarBancoQuestoes();
+      }
+    }
+
+    /* BACKUP & CONFIGURAÇÕES */
+    function exportarBackup() {
+      let dados = {
+        provas: JSON.parse(localStorage.getItem("provasSalvas") || "[]"),
+        banco: JSON.parse(localStorage.getItem("bancoQuestoes") || "[]")
+      };
+      let blob = new Blob([JSON.stringify(dados, null, 2)], { type: "application/json" });
+      let a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "backup_provas.json";
+      a.click();
+    }
+
+    function importarBackup(e) {
+      let file = e.target.files[0];
+      if (!file) return;
+
+      let reader = new FileReader();
+      reader.onload = function(evt) {
+        try {
+          let dados = JSON.parse(evt.target.result);
+          if (dados.provas) localStorage.setItem("provasSalvas", JSON.stringify(dados.provas));
+          if (dados.banco) localStorage.setItem("bancoQuestoes", JSON.stringify(dados.banco));
+          alert("Backup importado com sucesso!");
+        } catch (err) {
+          alert("Erro ao ler o arquivo de backup.");
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    function limparTudo() {
+      if (confirm("Tem certeza que deseja apagar todas as provas e questões salvas no aparelho?")) {
+        localStorage.clear();
+        alert("Todos os dados locais foram removidos.");
+      }
+    }
+
+    /* PAGINAÇÃO */
+    function paginarDocumento() {
+      const containerDoc = document.getElementById('documento-paginado');
+      containerDoc.innerHTML = '';
+
+      if (questoesArray.length === 0) {
+        containerDoc.innerHTML = '<div class="a4-page"><p style="text-align:center; padding: 20px; color:#666;">Adicione questões para visualizar as folhas.</p></div>';
+        atualizarNavegacao();
+        return;
+      }
+
+      let paginaIndex = 1;
+      let novaPagina = criarEstruturaPagina(paginaIndex);
+      containerDoc.appendChild(novaPagina);
+      let colunas = novaPagina.querySelector('.columns-container');
+
+      questoesArray.forEach((q) => {
+        const questaoElem = document.createElement("div");
+        questaoElem.className = "questao";
+        questaoElem.innerHTML = q.htmlContent;
+
+        colunas.appendChild(questaoElem);
+
+        if (colunas.scrollWidth > colunas.clientWidth) {
+          colunas.removeChild(questaoElem);
+          paginaIndex++;
+          novaPagina = criarEstruturaPagina(paginaIndex);
+          containerDoc.appendChild(novaPagina);
+          colunas = novaPagina.querySelector('.columns-container');
+          colunas.appendChild(questaoElem);
+        }
+      });
+
+      atualizarNavegacao();
+      ajustarEscolaMobile();
+    }
+
+    function criarEstruturaPagina(numPagina) {
+      const page = document.createElement('div');
+      page.className = 'a4-page';
+      page.id = `pagina-a4-${numPagina}`;
+      
+      let headerHtml = '';
+      let alturaColuna = '';
+
+      let tituloVal = document.getElementById("tituloProva").value.trim() || 'AVALIAÇÃO';
+      let disciplinaVal = document.getElementById("disciplina").value.trim() || 'Geral';
+      let professorVal = document.getElementById("professor").value.trim();
+      let turmaVal = document.getElementById("turma").value.trim();
+
+      let dataRaw = document.getElementById("data").value;
+      let dataVal = "____/____/________";
+      if (dataRaw) {
+        const partes = dataRaw.split("-");
+        if (partes.length === 3) {
+          dataVal = `${partes[2]}/${partes[1]}/${partes[0]}`;
+        }
+      }
+
+      if (numPagina === 1) {
+        headerHtml = `
+          <div class="header-bar">
+            <h1>${tituloVal}</h1>
+            <p>${disciplinaVal} • Folha ${numPagina}</p>
+          </div>
+          <div class="student-info">
+            <table>
+              <tr>
+                <td style="width: 50%;"><strong>Estudante:</strong> _____________________________________</td>
+                <td style="width: 50%;"><strong>Professor(a):</strong> ${professorVal}</td>
+              </tr>
+              <tr>
+                <td style="width: 33%;"><strong>Data:</strong> ${dataVal}</td>
+                <td style="width: 33%;"><strong>Turma:</strong> ${turmaVal}</td>
+                <td style="width: 34%;"><strong>Nota:</strong> _________</td>
+              </tr>
+            </table>
+          </div>
+        `;
+        alturaColuna = 'calc(297mm - 55mm)';
+      } else {
+        headerHtml = `
+          <div class="continuation-bar">
+            <span><strong>${disciplinaVal}</strong> - Continuação</span>
+            <span>Folha ${numPagina}</span>
+          </div>
+        `;
+        alturaColuna = 'calc(297mm - 32mm)';
+      }
+
+      page.innerHTML = `
+        ${headerHtml}
+        <div class="columns-container" style="height: ${alturaColuna};"></div>
+      `;
+      return page;
+    }
+
+    function atualizarNavegacao() {
+      const paginas = document.querySelectorAll('.a4-page');
+      const indicator = document.getElementById('page-indicator');
+      const btnPrev = document.getElementById('btn-prev');
+      const btnNext = document.getElementById('btn-next');
+
+      if (paginas.length === 0) {
+        if (indicator) indicator.textContent = "Folha 0 de 0";
+        if (btnPrev) btnPrev.disabled = true;
+        if (btnNext) btnNext.disabled = true;
+        return;
+      }
+
+      if (indicator) indicator.textContent = `Folha ${paginaAtual + 1} de ${paginas.length}`;
+      if (btnPrev) btnPrev.disabled = (paginaAtual === 0);
+      if (btnNext) btnNext.disabled = (paginaAtual === paginas.length - 1);
+    }
+
+    function irParaPagina(index) {
+      const paginas = document.querySelectorAll('.a4-page');
+      if (index < 0 || index >= paginas.length) return;
+      paginaAtual = index;
+      atualizarNavegacao();
+      paginas[paginaAtual].scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    function ajustarEscolaMobile() {
+      const paginas = document.querySelectorAll(".a4-page");
+      const larguraDisponivel = window.innerWidth - 30;
+      const larguraA4Pixels = 794;
+
+      paginas.forEach(pagina => {
+        if (window.innerWidth < 794) {
+          const escala = larguraDisponivel / larguraA4Pixels;
+          pagina.style.zoom = escala;
+          pagina.style.transform = "none";
+        } else {
+          pagina.style.zoom = "1";
+          pagina.style.transform = "none";
+        }
+      });
+    }
+
+    function abrirVisualizacao() {
+      document.getElementById("editor").style.display = "none";
+      document.getElementById("visualizacaoProva").style.display = "block";
+      paginaAtual = 0;
+      paginarDocumento();
+      window.scrollTo(0, 0);
+    }
+
+    function fecharVisualizacao() {
+      document.getElementById("visualizacaoProva").style.display = "none";
+      document.getElementById("editor").style.display = "block";
+    }
+
+    /* GERAÇÃO DIRETA DE PDF NO DISPOSITIVO */
+    function gerarPDFDireto() {
+      const elemento = document.getElementById("documento-paginado");
+      const btn = document.getElementById("btnDownloadPDF");
+      
+      btn.innerText = "⏳ Gerando PDF...";
+      btn.disabled = true;
+
+      // Reseta escala de tela para a captura exata das folhas A4
+      const paginas = document.querySelectorAll(".a4-page");
+      paginas.forEach(p => p.style.zoom = "1");
+
+      const titulo = document.getElementById("tituloProva").value.trim() || "prova";
+      
+      const opcoes = {
+        margin:       0,
+        filename:     `${titulo.toLowerCase().replace(/\s+/g, '_')}.pdf`,
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2, useCORS: true, logging: false },
+        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      };
+
+      html2pdf().set(opcoes).from(elemento).save().then(() => {
+        btn.innerText = "📥 Baixar PDF";
+        btn.disabled = false;
+        ajustarEscolaMobile();
+      }).catch(err => {
+        alert("Ocorreu um erro ao gerar o PDF. Tente novamente.");
+        btn.innerText = "📥 Baixar PDF";
+        btn.disabled = false;
+        ajustarEscolaMobile();
+      });
+    }
+
+    window.addEventListener('scroll', function() {
+      const vis = document.getElementById("visualizacaoProva");
+      if (vis && vis.style.display !== "none") {
+        const paginas = document.querySelectorAll('.a4-page');
+        paginas.forEach((pag, idx) => {
+          const rect = pag.getBoundingClientRect();
+          if (rect.top <= 250 && rect.bottom >= 250) {
+            if (paginaAtual !== idx) {
+              paginaAtual = idx;
+              atualizarNavegacao();
+            }
+          }
+        });
+      }
+    });
+
+    window.onload = function() {
+      paginarDocumento();
+      ajustarEscolaMobile();
+    };
+
+    window.onresize = ajustarEscolaMobile;
+  </script>
+</body>
+</html>
