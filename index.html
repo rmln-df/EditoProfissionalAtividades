@@ -67,16 +67,21 @@
       width: 100%; 
       overflow: hidden; 
       box-sizing: border-box;
+      flex-grow: 1;
     }
     .questao { margin-bottom: 14px; font-size: 9.5pt; line-height: 1.35; text-align: justify; break-inside: avoid; page-break-inside: avoid; }
+    .questao p { margin: 3px 0; }
     .questao-titulo { font-weight: bold; color: #1b365d; margin-bottom: 4px; border-left: 3px solid #2b6cb0; padding-left: 5px; break-after: avoid; }
-    
+    .alternativas-lista { margin-top: 4px; margin-bottom: 6px; padding-left: 2px; }
+    .alternativa-item { margin-bottom: 2px; text-align: left; }
+
     .editor { background: white; padding: 15px; border-radius: 8px; width: 100%; margin-bottom: 15px; }
     .editor label { display: block; font-weight: bold; color: #1b365d; margin-top: 10px; margin-bottom: 4px; font-size: 9.5pt; }
     .editor input, .editor textarea, .editor select { width: 100%; padding: 10px; margin-bottom: 12px; border: 1px solid #cbd5e0; border-radius: 6px; font-size: 9.5pt; background-color: #f8fafc; transition: border-color 0.2s, background-color 0.2s; }
     .editor input:focus, .editor textarea:focus, .editor select:focus { outline: none; border-color: #2b6cb0; background-color: #ffffff; }
     .editor textarea { height: 100px; resize: vertical; }
     #telaInicial { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg,#1b365d,#2b6cb0); display: flex; flex-direction: column; justify-content: center; align-items: center; color: white; z-index: 99999; }
+    #telaInicial h0 { font-size: clamp(70px,10vw,80px); margin-bottom: 10px; text-align: center; }
     #telaInicial h1 { font-size: clamp(40px,7vw,50px); margin-bottom: 10px; text-align: center; }
     #telaInicial h2 { font-size: clamp(20px,4vw,22px); font-weight: normal; margin-bottom: 25px; text-align: center; }
     #telaInicial button { width: 85%; max-width: 320px; padding: 16px; font-size: clamp(18px,4vw,22px); border: none; border-radius: 12px; cursor: pointer; background: white; color: #1b365d; font-weight: bold; }
@@ -102,9 +107,10 @@
 <body>
 
   <div id="telaInicial">
-    <h1>📚 PROVA IA</h1>
+    <h0>📚</h0>
+    <h1>EDITOR DE ATIVIDADES</h1>
     <h2>Editor Profissional de Atividades</h2>
-    <p>Versão 1.0</p>
+    <p>Versão 1.2 - Múltipla Escolha Corrigida</p>
     <button onclick="abrirSistema()">Entrar</button>
   </div>
 
@@ -126,6 +132,11 @@
         <div class="card-titulo">📚 Banco de Questões (Salvas no Aparelho)</div>
         <div class="card-conteudo">
           <div id="listaBancoQuestoes"></div>
+          
+          <button onclick="excluirTodasQuestoesBanco()" class="btn" style="background:#c53030; color:white; width:100%; padding:12px; margin-top:15px; margin-bottom:10px;">
+            🗑 Excluir Todas as Questões
+          </button>
+
           <button onclick="voltarMenu()" class="btn" style="background:#1b365d; color:white; width: 100%; padding: 12px; margin-top: 15px;">⬅ Voltar ao Menu</button>
         </div>
       </div>
@@ -213,11 +224,11 @@
 
             <div id="secaoMultiplaEscolha" style="display:none; border: 1px solid #2b6cb0; padding: 12px; border-radius: 6px; margin-bottom: 12px; background: #edf2f7;">
               <strong style="color: #1b365d;">Alternativas:</strong>
-              <label for="altA">A)</label><input type="text" id="altA">
-              <label for="altB">B)</label><input type="text" id="altB">
-              <label for="altC">C)</label><input type="text" id="altC">
-              <label for="altD">D)</label><input type="text" id="altD">
-              <label for="altE">E)</label><input type="text" id="altE">
+              <label for="altA">A)</label><input type="text" id="altA" placeholder="Texto da alternativa A">
+              <label for="altB">B)</label><input type="text" id="altB" placeholder="Texto da alternativa B">
+              <label for="altC">C)</label><input type="text" id="altC" placeholder="Texto da alternativa C">
+              <label for="altD">D)</label><input type="text" id="altD" placeholder="Texto da alternativa D">
+              <label for="altE">E)</label><input type="text" id="altE" placeholder="Texto da alternativa E">
               <label for="corretaMultipla">Alternativa Correta</label>
               <select id="corretaMultipla">
                 <option value="">Selecione...</option>
@@ -339,6 +350,7 @@
       document.getElementById("novaQuestao").style.display = "none";
       document.getElementById("tituloQuestao").innerHTML = "➕ Nova Questão / Edição ▶";
 
+      limparFormulario();
       renderizarListaEditor();
       paginarDocumento();
       
@@ -410,11 +422,11 @@
       let espaco = document.getElementById("espaco").value;
       let calculo = document.getElementById("calculo").checked;
 
-      let altA = document.getElementById("altA").value;
-      let altB = document.getElementById("altB").value;
-      let altC = document.getElementById("altC").value;
-      let altD = document.getElementById("altD").value;
-      let altE = document.getElementById("altE").value;
+      let altA = document.getElementById("altA").value.trim();
+      let altB = document.getElementById("altB").value.trim();
+      let altC = document.getElementById("altC").value.trim();
+      let altD = document.getElementById("altD").value.trim();
+      let altE = document.getElementById("altE").value.trim();
       let corretaMultipla = document.getElementById("corretaMultipla").value;
       let respostaCE = document.getElementById("respostaCE").value;
       let respostaVF = document.getElementById("respostaVF").value;
@@ -422,11 +434,13 @@
       let html = `<div class='questao-titulo'>${titulo}</div><p>${enunciado}</p>`;
 
       if (tipo === "multipla") {
-        if(altA) html += `<p>A) ( ) ${altA}</p>`;
-        if(altB) html += `<p>B) ( ) ${altB}</p>`;
-        if(altC) html += `<p>C) ( ) ${altC}</p>`;
-        if(altD) html += `<p>D) ( ) ${altD}</p>`;
-        if(altE) html += `<p>E) ( ) ${altE}</p>`;
+        html += `<div class="alternativas-lista">`;
+        html += `<div class="alternativa-item">a) ( &nbsp; ) ${altA}</div>`;
+        html += `<div class="alternativa-item">b) ( &nbsp; ) ${altB}</div>`;
+        html += `<div class="alternativa-item">c) ( &nbsp; ) ${altC}</div>`;
+        html += `<div class="alternativa-item">d) ( &nbsp; ) ${altD}</div>`;
+        html += `<div class="alternativa-item">e) ( &nbsp; ) ${altE}</div>`;
+        html += `</div>`;
         if (corretaMultipla) gabarito = "Alternativa " + corretaMultipla;
       } else if (tipo === "ce") {
         html += "<p>CERTO ( ) &nbsp;&nbsp; ERRADO ( )</p>";
@@ -502,6 +516,7 @@
 
       document.getElementById("novaQuestao").scrollIntoView({ behavior: 'smooth' });
     }
+
     function cancelarEdicao() {
       questaoEmEdicaoId = null;
       limparFormulario();
@@ -515,6 +530,7 @@
     function limparFormulario() {
       document.getElementById("titulo").value = "";
       document.getElementById("enunciado").value = "";
+      document.getElementById("tipo").value = "dissertativa";
       document.getElementById("gabarito").value = "";
       document.getElementById("espaco").value = "0";
       document.getElementById("calculo").checked = false;
@@ -594,6 +610,7 @@
       localStorage.setItem("provasSalvas", JSON.stringify(provasSalvas));
       alert("✅ Prova '" + titulo + "' salva com sucesso no dispositivo!");
     }
+
     function renderizarProvasSalvas() {
       let lista = document.getElementById("listaProvasSalvas");
       let provasSalvas = JSON.parse(localStorage.getItem("provasSalvas") || "[]");
@@ -649,7 +666,6 @@
         renderizarProvasSalvas();
       }
     }
-
     function salvarQuestaoNoBanco(questao) {
       let banco = JSON.parse(localStorage.getItem("bancoQuestoes") || "[]");
       let index = banco.findIndex(q => q.id === questao.id);
@@ -719,6 +735,21 @@
       }
     }
 
+    function excluirTodasQuestoesBanco() {
+      if (!confirm("Deseja realmente excluir TODAS as questões do Banco de Questões?")) {
+        return;
+      }
+
+      if (!confirm("Esta ação é definitiva e não poderá ser desfeita. Deseja continuar?")) {
+        return;
+      }
+
+      localStorage.removeItem("bancoQuestoes");
+      renderizarBancoQuestoes();
+
+      alert("✅ Todas as questões foram excluídas.");
+    }
+
     /* BACKUP & CONFIGURAÇÕES */
     function exportarBackup() {
       let dados = {
@@ -757,7 +788,7 @@
       }
     }
 
-    /* PAGINAÇÃO DE DOCUMENTO */
+    /* PAGINAÇÃO REVISADA E CORRIGIDA */
     function paginarDocumento() {
       const containerDoc = document.getElementById('documento-paginado');
       containerDoc.innerHTML = '';
@@ -769,6 +800,9 @@
         return;
       }
 
+      const LIMITE_ALTURA_PAG1 = 1600;
+      const LIMITE_ALTURA_OUTRAS = 1850;
+
       let paginaIndex = 1;
       let novaPagina = criarEstruturaPagina(paginaIndex);
       
@@ -778,6 +812,7 @@
       containerDoc.appendChild(wrapper);
 
       let colunas = novaPagina.querySelector('.columns-container');
+      let alturaAcumulada = 0;
 
       questoesArray.forEach((q) => {
         const questaoElem = document.createElement("div");
@@ -785,10 +820,13 @@
         questaoElem.innerHTML = q.htmlContent;
 
         colunas.appendChild(questaoElem);
+        const alturaQuestao = questaoElem.offsetHeight || 120;
 
-        // Verifica estouro vertical do contêiner de colunas
-        if (colunas.scrollHeight > colunas.clientHeight) {
+        const limiteAtual = (paginaIndex === 1) ? LIMITE_ALTURA_PAG1 : LIMITE_ALTURA_OUTRAS;
+
+        if (alturaAcumulada + alturaQuestao > limiteAtual && colunas.children.length > 1) {
           colunas.removeChild(questaoElem);
+
           paginaIndex++;
           novaPagina = criarEstruturaPagina(paginaIndex);
           
@@ -799,6 +837,10 @@
 
           colunas = novaPagina.querySelector('.columns-container');
           colunas.appendChild(questaoElem);
+
+          alturaAcumulada = questaoElem.offsetHeight || 120;
+        } else {
+          alturaAcumulada += alturaQuestao;
         }
       });
 
