@@ -8,18 +8,52 @@
   <!-- BIBLIOTECA PARA GERAR PDF DIRETO NO CELULAR -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
+
   <style>
     *, *::before, *::after { box-sizing: border-box; }
-    body { font-family: Arial, sans-serif; background-color: #525659; margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
-    .controls { position: fixed; top: 0; left: 0; right: 0; z-index: 10000; width: 100%; height: 60px; display: flex; align-items: center; justify-content: center; gap: 12px; padding: 0 15px; background: #1b365d; color: white; box-shadow: 0 3px 10px rgba(0,0,0,0.3); }
+    body { font-family: Arial, sans-serif; background-color: #525659; margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; overflow-x: hidden; }
+    
+    /* CONTROLES E BOTÕES DO TOPO */
+    .controls { position: fixed; top: 0; left: 0; right: 0; z-index: 10000; width: 100%; display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 10px 15px; background: #1b365d; color: white; box-shadow: 0 3px 10px rgba(0,0,0,0.3); }
+    .controls-top { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; }
+    
     .btn { background-color: #ffffff; color: #1b365d; border: none; padding: 8px 14px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 9pt; transition: background 0.2s; }
     .btn:hover { background-color: #e2e8f0; }
     .btn:disabled { background-color: #a0aec0; color: #666; cursor: not-allowed; }
+    .btn-full { width: 100%; max-width: 400px; padding: 10px; font-size: 10pt; }
+    
     .btn-edit { background-color: #d69e2e; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 8pt; margin-right: 5px; }
     .btn-delete { background-color: #c53030; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 8pt; }
-    .page-scaler { width: 100%; margin-top: 70px; padding: 20px 0 50px 0; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; }
-    #documento-paginado { display: flex; flex-direction: column; align-items: center; gap: 30px; width: 100%; }
-    .a4-page { width: 210mm; height: 297mm; padding: 12mm; background: #ffffff; display: flex; flex-direction: column; box-shadow: 0 8px 20px rgba(0,0,0,0.4); position: relative; overflow: hidden; box-sizing: border-box; margin: 0 auto; }
+    
+    .page-scaler { width: 100%; margin-top: 105px; padding: 15px 0 50px 0; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; overflow-x: hidden; }
+    #documento-paginado { display: flex; flex-direction: column; align-items: center; gap: 20px; width: 100%; }
+    
+.page-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  overflow: visible; /* Permite visualizar o contêiner centralizado */
+  position: relative;
+  margin: 0 auto;
+  width: 100%;       /* Garante uso total da largura */
+}
+.a4-page { 
+  width: 210mm; 
+  height: 297mm; 
+  min-width: 210mm; 
+  min-height: 297mm; 
+  aspect-ratio: 1 / 1.4142; 
+  padding: 12mm; 
+  background: #ffffff; 
+  display: flex; 
+  flex-direction: column; 
+  box-shadow: 0 8px 20px rgba(0,0,0,0.4); 
+  position: relative; 
+  overflow: hidden; 
+  box-sizing: border-box; 
+  transform-origin: top center; /* <--- MUDOU DE 'top left' PARA 'top center' */
+}
+    
     .header-bar { background-color: #1b365d; color: #ffffff; text-align: center; padding: 8px 10px; border-radius: 2px; margin-bottom: 10px; flex-shrink: 0; }
     .header-bar h1 { margin: 0; font-size: 11pt; text-transform: uppercase; }
     .header-bar p { margin: 2px 0 0 0; font-size: 8pt; }
@@ -36,8 +70,8 @@
     .editor input:focus, .editor textarea:focus, .editor select:focus { outline: none; border-color: #2b6cb0; background-color: #ffffff; }
     .editor textarea { height: 100px; resize: vertical; }
     #telaInicial { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg,#1b365d,#2b6cb0); display: flex; flex-direction: column; justify-content: center; align-items: center; color: white; z-index: 99999; }
-    #telaInicial h1 { font-size: clamp(30px,7vw,50px); margin-bottom: 10px; text-align: center; }
-    #telaInicial h2 { font-size: clamp(16px,4vw,22px); font-weight: normal; margin-bottom: 25px; text-align: center; }
+    #telaInicial h1 { font-size: clamp(40px,7vw,50px); margin-bottom: 10px; text-align: center; }
+    #telaInicial h2 { font-size: clamp(20px,4vw,22px); font-weight: normal; margin-bottom: 25px; text-align: center; }
     #telaInicial button { width: 85%; max-width: 320px; padding: 16px; font-size: clamp(18px,4vw,22px); border: none; border-radius: 12px; cursor: pointer; background: white; color: #1b365d; font-weight: bold; }
     #menuPrincipal { width: 210mm; max-width: 95%; margin: 30px auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,.15); }
     #menuPrincipal h2 { text-align: center; color: #1b365d; margin-bottom: 10px; }
@@ -51,11 +85,8 @@
     
     @media(max-width: 768px) {
       .card, #menuPrincipal { width: 95%; margin: 10px auto; border-radius: 10px; }
-      .controls { flex-wrap: wrap; height: auto; padding: 8px; }
-      .page-scaler { margin-top: 100px; }
       .card-conteudo { padding: 12px; }
       .editor { padding: 10px; }
-      .btn { flex: 1; min-width: 90px; }
       .item-salvo { flex-direction: column; align-items: flex-start; gap: 10px; }
     }
   </style>
@@ -64,7 +95,7 @@
 <body>
 
   <div id="telaInicial">
-    <h1>📚 PROVA AI</h1>
+    <h1>📚 PROVA IA</h1>
     <h2>Editor Profissional de Atividades</h2>
     <p>Versão 1.0</p>
     <button onclick="abrirSistema()">Entrar</button>
@@ -122,7 +153,7 @@
     <!-- EDITOR DE PROVA -->
     <div id="editor" style="display:none;">
       
-      <!-- CARD DADOS DA PROVA (Inicia recuado) -->
+      <!-- CARD DADOS DA PROVA -->
       <div class="card">
         <div class="card-titulo" id="tituloDados" onclick="alternarCard('dadosProva','tituloDados','📄 Dados da Prova')">
           📄 Dados da Prova ▶
@@ -152,7 +183,7 @@
         </div>
       </div>
 
-      <!-- CARD NOVA QUESTÃO / EDIÇÃO (Inicia recuado) -->
+      <!-- CARD NOVA QUESTÃO / EDIÇÃO -->
       <div class="card">
         <div class="card-titulo" id="tituloQuestao" onclick="alternarCard('novaQuestao','tituloQuestao','➕ Nova Questão / Edição')">
           ➕ Nova Questão / Edição ▶
@@ -227,7 +258,6 @@
               </label>
             </div>
 
-            <!-- BOTÃO DE SALVAR/ADICIONAR QUESTÃO -->
             <div id="container-btn-salvar">
               <button class="btn" id="btnSalvarQuestao" style="background:#1b365d; color:white; width:100%; padding: 12px; font-size: 11pt;" onclick="adicionarOuSalvarQuestao()">
                 ➕ Adicionar Questão
@@ -237,14 +267,12 @@
         </div>
       </div>
 
-      <!-- BOTÃO VOLTAR AO MENU (POSICIONADO ENTRE OS DOIS CARDS) -->
       <div style="width: 210mm; max-width: 95%; margin: 0 auto 18px auto;">
         <button class="btn" style="background:#1b365d; color:white; width:100%; padding: 14px; font-size: 11pt; border-radius: 10px;" onclick="voltarMenu()">
           ⬅ Voltar ao Menu
         </button>
       </div>
 
-      <!-- CARD QUESTÕES ADICIONADAS -->
       <div class="card">
         <div class="card-titulo">📋 Questões Adicionadas</div>
         <div class="card-conteudo">
@@ -260,11 +288,13 @@
     <!-- VISUALIZAÇÃO -->
     <div id="visualizacaoProva" style="display:none; width: 100%;">
       <div class="controls">
-        <button class="btn" onclick="fecharVisualizacao()">← Voltar ao Editor</button>
-        <button class="btn" id="btn-prev" onclick="irParaPagina(paginaAtual - 1)">← Anterior</button>
-        <span id="page-indicator" style="font-size: 9pt; font-weight: bold;">Folha 1 de 1</span>
-        <button class="btn" id="btn-next" onclick="irParaPagina(paginaAtual + 1)">Próxima →</button>
-        <button class="btn" id="btnDownloadPDF" style="background-color: #2b6cb0; color:white;" onclick="gerarPDFDireto()">📥 Baixar PDF</button>
+        <div class="controls-top">
+          <button class="btn" onclick="fecharVisualizacao()">← Voltar ao Editor</button>
+          <button class="btn" id="btn-prev" onclick="irParaPagina(paginaAtual - 1)">← Anterior</button>
+          <span id="page-indicator" style="font-size: 9pt; font-weight: bold;">Folha 1 de 1</span>
+          <button class="btn" id="btn-next" onclick="irParaPagina(paginaAtual + 1)">Próxima →</button>
+        </div>
+        <button class="btn btn-full" id="btnDownloadPDF" style="background-color: #2b6cb0; color:white;" onclick="gerarPDFDireto()">📥 Baixar PDF</button>
       </div>
 
       <div class="page-scaler">
@@ -286,6 +316,7 @@
       document.getElementById("menuPrincipal").style.display = "block";
       document.getElementById("editor").style.display = "none";
     }
+
     function abrirNovaProva() {
       provaAtualId = Date.now();
       questoesArray = [];
@@ -295,7 +326,6 @@
       document.getElementById("turma").value = "";
       document.getElementById("data").value = "";
 
-      // Inicia com cards de formulário recuados/fechados
       document.getElementById("dadosProva").style.display = "none";
       document.getElementById("tituloDados").innerHTML = "📄 Dados da Prova ▶";
 
@@ -356,18 +386,6 @@
       }
     }
 
-    function alternarCard(id, titulo, texto) {
-      let card = document.getElementById(id);
-      let t = document.getElementById(titulo);
-      if (card.style.display === "none") {
-        card.style.display = "block";
-        t.innerHTML = texto + " ▼";
-      } else {
-        card.style.display = "none";
-        t.innerHTML = texto + " ▶";
-      }
-    }
-
     function alternarCamposTipo() {
       let tipo = document.getElementById("tipo").value;
       document.getElementById("secaoMultiplaEscolha").style.display = tipo === "multipla" ? "block" : "none";
@@ -377,7 +395,7 @@
       document.getElementById("secaoLinhas").style.display = tipo === "dissertativa" ? "block" : "none";
     }
 
-   function adicionarOuSalvarQuestao() {
+    function adicionarOuSalvarQuestao() {
       let titulo = document.getElementById("titulo").value || "Questão";
       let enunciado = document.getElementById("enunciado").value;
       let tipo = document.getElementById("tipo").value;
@@ -526,7 +544,8 @@
         `;
         lista.appendChild(item);
       });
-                }
+    }
+
     function excluirQuestao(id) {
       if (confirm("Deseja realmente excluir esta questão da prova?")) {
         if (questaoEmEdicaoId === id) cancelarEdicao();
@@ -565,6 +584,7 @@
       localStorage.setItem("provasSalvas", JSON.stringify(provasSalvas));
       alert("✅ Prova '" + titulo + "' salva com sucesso no dispositivo!");
     }
+
     function renderizarProvasSalvas() {
       let lista = document.getElementById("listaProvasSalvas");
       let provasSalvas = JSON.parse(localStorage.getItem("provasSalvas") || "[]");
@@ -658,7 +678,6 @@
         lista.appendChild(div);
       });
     }
-
     function importarQuestaoParaProva(id) {
       let banco = JSON.parse(localStorage.getItem("bancoQuestoes") || "[]");
       let q = banco.find(item => item.id === id);
@@ -675,11 +694,10 @@
       renderizarListaEditor();
       paginarDocumento();
 
-      // Transfere diretamente o usuário para a área do editor para visualizar
       document.getElementById("bancoQuestoes").style.display = "none";
       document.getElementById("editor").style.display = "block";
 
-      alert(" Questão importada com sucesso! Você foi redirecionado para o Editor de Prova.");
+      alert("Questão importada com sucesso!");
     }
 
     function excluirQuestaoBanco(id) {
@@ -729,20 +747,26 @@
       }
     }
 
-    /* PAGINAÇÃO */
+    /* PAGINAÇÃO DE DOCUMENTO ENVOLTA EM WRAPPER RESPONSIVO COM PROPORÇÃO A4 CORRETA */
     function paginarDocumento() {
       const containerDoc = document.getElementById('documento-paginado');
       containerDoc.innerHTML = '';
 
       if (questoesArray.length === 0) {
-        containerDoc.innerHTML = '<div class="a4-page"><p style="text-align:center; padding: 20px; color:#666;">Adicione questões para visualizar as folhas.</p></div>';
+        containerDoc.innerHTML = '<div class="page-wrapper"><div class="a4-page"><p style="text-align:center; padding: 20px; color:#666;">Adicione questões para visualizar as folhas.</p></div></div>';
         atualizarNavegacao();
+        ajustarEscolaMobile();
         return;
       }
 
       let paginaIndex = 1;
       let novaPagina = criarEstruturaPagina(paginaIndex);
-      containerDoc.appendChild(novaPagina);
+      
+      let wrapper = document.createElement('div');
+      wrapper.className = 'page-wrapper';
+      wrapper.appendChild(novaPagina);
+      containerDoc.appendChild(wrapper);
+
       let colunas = novaPagina.querySelector('.columns-container');
 
       questoesArray.forEach((q) => {
@@ -756,7 +780,12 @@
           colunas.removeChild(questaoElem);
           paginaIndex++;
           novaPagina = criarEstruturaPagina(paginaIndex);
-          containerDoc.appendChild(novaPagina);
+          
+          wrapper = document.createElement('div');
+          wrapper.className = 'page-wrapper';
+          wrapper.appendChild(novaPagina);
+          containerDoc.appendChild(wrapper);
+
           colunas = novaPagina.querySelector('.columns-container');
           colunas.appendChild(questaoElem);
         }
@@ -852,19 +881,33 @@
       paginas[paginaAtual].scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
 
-    function ajustarEscolaMobile() {
+    /* REDIMENSIONAMENTO PRECISO MANTENDO PROPORÇÃO A4 EXACTA */
+    
+      function ajustarEscolaMobile() {
       const paginas = document.querySelectorAll(".a4-page");
-      const larguraDisponivel = window.innerWidth - 30;
-      const larguraA4Pixels = 794;
+      const margemSeguranca = 24; // Margem para não colar nas bordas laterais do celular
+      const larguraDisponivel = Math.min(document.documentElement.clientWidth - margemSeguranca, 800);
+      const larguraA4Pixels = 794; // 210mm a 96 DPI
+      const alturaA4Pixels = 1123; // 297mm a 96 DPI
 
       paginas.forEach(pagina => {
-        if (window.innerWidth < 794) {
+        const wrapper = pagina.parentElement;
+        
+        if (larguraDisponivel < larguraA4Pixels) {
           const escala = larguraDisponivel / larguraA4Pixels;
-          pagina.style.zoom = escala;
-          pagina.style.transform = "none";
+          
+          pagina.style.transform = `scale(${escala})`;
+          
+          if (wrapper && wrapper.classList.contains("page-wrapper")) {
+            wrapper.style.width = `${larguraA4Pixels * escala}px`;
+            wrapper.style.height = `${alturaA4Pixels * escala}px`;
+          }
         } else {
-          pagina.style.zoom = "1";
           pagina.style.transform = "none";
+          if (wrapper && wrapper.classList.contains("page-wrapper")) {
+            wrapper.style.width = "210mm";
+            wrapper.style.height = "297mm";
+          }
         }
       });
     }
@@ -882,7 +925,7 @@
       document.getElementById("editor").style.display = "block";
     }
 
-    /* GERAÇÃO DIRETA DE PDF NO DISPOSITIVO */
+    /* GERAÇÃO DIRETA DE PDF COMPATÍVEL COM WEBVIEW / KODULAR */
     function gerarPDFDireto() {
       const elemento = document.getElementById("documento-paginado");
       const btn = document.getElementById("btnDownloadPDF");
@@ -890,8 +933,11 @@
       btn.innerText = "⏳ Gerando PDF...";
       btn.disabled = true;
 
+      // Reseta temporariamente a escala para renderizar o PDF em alta resolução
       const paginas = document.querySelectorAll(".a4-page");
-      paginas.forEach(p => p.style.zoom = "1");
+      paginas.forEach(p => {
+        p.style.transform = "none";
+      });
 
       const titulo = document.getElementById("tituloProva").value.trim() || "prova";
       
@@ -903,10 +949,17 @@
         jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
       };
 
-      html2pdf().set(opcoes).from(elemento).save().then(() => {
+      html2pdf().set(opcoes).from(elemento).toPdf().output('datauristring').then(function (pdfAsString) {
         btn.innerText = "📥 Baixar PDF";
         btn.disabled = false;
         ajustarEscolaMobile();
+        
+        var win = window.open();
+        if (win) {
+          win.document.write('<iframe src="' + pdfAsString + '" frameborder="0" style="border:0; top:0px; left:0px; bottom:0px; right:0px; width:100%; height:100%;" allowfullscreen></iframe>');
+        } else {
+          window.location.href = pdfAsString;
+        }
       }).catch(err => {
         alert("Ocorreu um erro ao gerar o PDF. Tente novamente.");
         btn.innerText = "📥 Baixar PDF";
