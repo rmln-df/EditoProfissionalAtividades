@@ -8,7 +8,6 @@
   <!-- BIBLIOTECA PARA GERAR PDF DIRETO NO CELULAR -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
-
   <style>
     *, *::before, *::after { box-sizing: border-box; }
     body { font-family: Arial, sans-serif; background-color: #525659; margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; overflow-x: hidden; }
@@ -28,31 +27,31 @@
     .page-scaler { width: 100%; margin-top: 105px; padding: 15px 0 50px 0; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; overflow-x: hidden; }
     #documento-paginado { display: flex; flex-direction: column; align-items: center; gap: 20px; width: 100%; }
     
-.page-wrapper {
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  overflow: visible; /* Permite visualizar o contêiner centralizado */
-  position: relative;
-  margin: 0 auto;
-  width: 100%;       /* Garante uso total da largura */
-}
-.a4-page { 
-  width: 210mm; 
-  height: 297mm; 
-  min-width: 210mm; 
-  min-height: 297mm; 
-  aspect-ratio: 1 / 1.4142; 
-  padding: 12mm; 
-  background: #ffffff; 
-  display: flex; 
-  flex-direction: column; 
-  box-shadow: 0 8px 20px rgba(0,0,0,0.4); 
-  position: relative; 
-  overflow: hidden; 
-  box-sizing: border-box; 
-  transform-origin: top center; /* <--- MUDOU DE 'top left' PARA 'top center' */
-}
+    .page-wrapper {
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      overflow: visible;
+      position: relative;
+      margin: 0 auto;
+      width: 100%;
+    }
+    .a4-page { 
+      width: 210mm; 
+      height: 297mm; 
+      min-width: 210mm; 
+      min-height: 297mm; 
+      aspect-ratio: 1 / 1.4142; 
+      padding: 12mm; 
+      background: #ffffff; 
+      display: flex; 
+      flex-direction: column; 
+      box-shadow: 0 8px 20px rgba(0,0,0,0.4); 
+      position: relative; 
+      overflow: hidden; 
+      box-sizing: border-box; 
+      transform-origin: top center;
+    }
     
     .header-bar { background-color: #1b365d; color: #ffffff; text-align: center; padding: 8px 10px; border-radius: 2px; margin-bottom: 10px; flex-shrink: 0; }
     .header-bar h1 { margin: 0; font-size: 11pt; text-transform: uppercase; }
@@ -60,8 +59,16 @@
     .student-info { width: 100%; margin-bottom: 10px; border-bottom: 1.5px solid #1b365d; padding-bottom: 6px; font-size: 8.5pt; flex-shrink: 0; }
     .student-info table { width: 100%; border-collapse: collapse; }
     .continuation-bar { font-size: 8pt; color: #555; display: flex; justify-content: space-between; border-bottom: 1px solid #ccc; padding-bottom: 4px; margin-bottom: 10px; flex-shrink: 0; }
-    .columns-container { column-count: 2; column-gap: 24px; column-rule: 1px solid #000000; width: 100%; overflow: hidden; }
-    .questao { margin-bottom: 14px; font-size: 9.5pt; line-height: 1.35; text-align: justify; break-inside: avoid; }
+    
+    .columns-container { 
+      column-count: 2; 
+      column-gap: 24px; 
+      column-rule: 1px solid #000000; 
+      width: 100%; 
+      overflow: hidden; 
+      box-sizing: border-box;
+    }
+    .questao { margin-bottom: 14px; font-size: 9.5pt; line-height: 1.35; text-align: justify; break-inside: avoid; page-break-inside: avoid; }
     .questao-titulo { font-weight: bold; color: #1b365d; margin-bottom: 4px; border-left: 3px solid #2b6cb0; padding-left: 5px; break-after: avoid; }
     
     .editor { background: white; padding: 15px; border-radius: 8px; width: 100%; margin-bottom: 15px; }
@@ -415,7 +422,11 @@
       let html = `<div class='questao-titulo'>${titulo}</div><p>${enunciado}</p>`;
 
       if (tipo === "multipla") {
-        html += `<p>A) ( ) ${altA}</p><p>B) ( ) ${altB}</p><p>C) ( ) ${altC}</p><p>D) ( ) ${altD}</p><p>E) ( ) ${altE}</p>`;
+        if(altA) html += `<p>A) ( ) ${altA}</p>`;
+        if(altB) html += `<p>B) ( ) ${altB}</p>`;
+        if(altC) html += `<p>C) ( ) ${altC}</p>`;
+        if(altD) html += `<p>D) ( ) ${altD}</p>`;
+        if(altE) html += `<p>E) ( ) ${altE}</p>`;
         if (corretaMultipla) gabarito = "Alternativa " + corretaMultipla;
       } else if (tipo === "ce") {
         html += "<p>CERTO ( ) &nbsp;&nbsp; ERRADO ( )</p>";
@@ -491,7 +502,6 @@
 
       document.getElementById("novaQuestao").scrollIntoView({ behavior: 'smooth' });
     }
-
     function cancelarEdicao() {
       questaoEmEdicaoId = null;
       limparFormulario();
@@ -584,7 +594,6 @@
       localStorage.setItem("provasSalvas", JSON.stringify(provasSalvas));
       alert("✅ Prova '" + titulo + "' salva com sucesso no dispositivo!");
     }
-
     function renderizarProvasSalvas() {
       let lista = document.getElementById("listaProvasSalvas");
       let provasSalvas = JSON.parse(localStorage.getItem("provasSalvas") || "[]");
@@ -678,6 +687,7 @@
         lista.appendChild(div);
       });
     }
+
     function importarQuestaoParaProva(id) {
       let banco = JSON.parse(localStorage.getItem("bancoQuestoes") || "[]");
       let q = banco.find(item => item.id === id);
@@ -747,7 +757,7 @@
       }
     }
 
-    /* PAGINAÇÃO DE DOCUMENTO ENVOLTA EM WRAPPER RESPONSIVO COM PROPORÇÃO A4 CORRETA */
+    /* PAGINAÇÃO DE DOCUMENTO */
     function paginarDocumento() {
       const containerDoc = document.getElementById('documento-paginado');
       containerDoc.innerHTML = '';
@@ -776,7 +786,8 @@
 
         colunas.appendChild(questaoElem);
 
-        if (colunas.scrollWidth > colunas.clientWidth) {
+        // Verifica estouro vertical do contêiner de colunas
+        if (colunas.scrollHeight > colunas.clientHeight) {
           colunas.removeChild(questaoElem);
           paginaIndex++;
           novaPagina = criarEstruturaPagina(paginaIndex);
@@ -881,21 +892,19 @@
       paginas[paginaAtual].scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
 
-    /* REDIMENSIONAMENTO PRECISO MANTENDO PROPORÇÃO A4 EXACTA */
-    
-      function ajustarEscolaMobile() {
+    /* REDIMENSIONAMENTO MOBILE */
+    function ajustarEscolaMobile() {
       const paginas = document.querySelectorAll(".a4-page");
-      const margemSeguranca = 24; // Margem para não colar nas bordas laterais do celular
+      const margemSeguranca = 24; 
       const larguraDisponivel = Math.min(document.documentElement.clientWidth - margemSeguranca, 800);
-      const larguraA4Pixels = 794; // 210mm a 96 DPI
-      const alturaA4Pixels = 1123; // 297mm a 96 DPI
+      const larguraA4Pixels = 794; 
+      const alturaA4Pixels = 1123; 
 
       paginas.forEach(pagina => {
         const wrapper = pagina.parentElement;
         
         if (larguraDisponivel < larguraA4Pixels) {
           const escala = larguraDisponivel / larguraA4Pixels;
-          
           pagina.style.transform = `scale(${escala})`;
           
           if (wrapper && wrapper.classList.contains("page-wrapper")) {
@@ -925,7 +934,7 @@
       document.getElementById("editor").style.display = "block";
     }
 
-    /* GERAÇÃO DIRETA DE PDF COMPATÍVEL COM WEBVIEW / KODULAR */
+    /* GERAÇÃO DIRETA DE PDF */
     function gerarPDFDireto() {
       const elemento = document.getElementById("documento-paginado");
       const btn = document.getElementById("btnDownloadPDF");
@@ -933,7 +942,6 @@
       btn.innerText = "⏳ Gerando PDF...";
       btn.disabled = true;
 
-      // Reseta temporariamente a escala para renderizar o PDF em alta resolução
       const paginas = document.querySelectorAll(".a4-page");
       paginas.forEach(p => {
         p.style.transform = "none";
@@ -949,17 +957,10 @@
         jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
       };
 
-      html2pdf().set(opcoes).from(elemento).toPdf().output('datauristring').then(function (pdfAsString) {
+      html2pdf().set(opcoes).from(elemento).save().then(function() {
         btn.innerText = "📥 Baixar PDF";
         btn.disabled = false;
         ajustarEscolaMobile();
-        
-        var win = window.open();
-        if (win) {
-          win.document.write('<iframe src="' + pdfAsString + '" frameborder="0" style="border:0; top:0px; left:0px; bottom:0px; right:0px; width:100%; height:100%;" allowfullscreen></iframe>');
-        } else {
-          window.location.href = pdfAsString;
-        }
       }).catch(err => {
         alert("Ocorreu um erro ao gerar o PDF. Tente novamente.");
         btn.innerText = "📥 Baixar PDF";
