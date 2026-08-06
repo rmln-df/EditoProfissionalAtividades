@@ -377,6 +377,13 @@
       document.getElementById("disciplina").value = "";
       document.getElementById("professor").value = "";
       document.getElementById("turma").value = "";
+    function abrirNovaProva() {
+      provaAtualId = Date.now();
+      questoesArray = [];
+      document.getElementById("tituloProva").value = "";
+      document.getElementById("disciplina").value = "";
+      document.getElementById("professor").value = "";
+      document.getElementById("turma").value = "";
       document.getElementById("data").value = "";
 
       document.getElementById("dadosProva").style.display = "none";
@@ -514,7 +521,8 @@
       salvarQuestaoNoBanco(dadosQuestao);
       renderizarListaEditor();
     }
-function editarQuestao(id) {
+
+    function editarQuestao(id) {
       let q = questoesArray.find(item => item.id === id);
       if (!q) return;
 
@@ -576,8 +584,7 @@ function editarQuestao(id) {
       document.getElementById("respostaVF").value = "";
       alternarCamposTipo();
     }
-
-    function renderizarListaEditor() {
+      function renderizarListaEditor() {
       let lista = document.getElementById("listaQuestoes");
       if (questoesArray.length === 0) {
         lista.innerHTML = '<p style="color:#777;text-align:center;">Nenhuma questão adicionada.</p>';
@@ -804,7 +811,8 @@ function editarQuestao(id) {
 
       alert(marcadas.length + " questão(ões) importada(s) com sucesso!");
     }
-function excluirSelecionadas() {
+
+    function excluirSelecionadas() {
       let selecionadas = document.querySelectorAll(".checkQuestao:checked");
 
       if (selecionadas.length === 0) {
@@ -904,7 +912,7 @@ function excluirSelecionadas() {
       wrapper.className = 'page-wrapper';
       wrapper.appendChild(novaPagina);
       containerDoc.appendChild(wrapper);
-
+      
       let colunas = novaPagina.querySelector('.columns-container');
       let alturaAcumulada = 0;
 
@@ -1129,7 +1137,7 @@ function excluirSelecionadas() {
       }
     });
 
-    window.onload = function() {
+  window.onload = function() {
       ajustarEscolaMobile();
     };
 
