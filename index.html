@@ -169,7 +169,6 @@
         </div>
       </div>
     </div>
-
     <!-- PROVAS SALVAS -->
     <div id="provasSalvas" style="display:none;">
       <div class="card">
@@ -348,8 +347,7 @@
         </div>
         <button class="btn btn-full" id="btnDownloadPDF" style="background-color: #2b6cb0; color:white;" onclick="gerarPDFDireto()">📥 Baixar PDF</button>
       </div>
-
-      <div class="page-scaler">
+       <div class="page-scaler">
         <div id="documento-paginado"></div>
       </div>
     </div>
@@ -367,6 +365,52 @@
       document.getElementById("sistema").style.display = "block";
       document.getElementById("menuPrincipal").style.display = "block";
       document.getElementById("editor").style.display = "none";
+    }
+
+    function abrirNovaProva() {
+      provaAtualId = Date.now();
+      questoesArray = [];
+      document.getElementById("tituloProva").value = "";
+      document.getElementById("disciplina").value = "";
+      document.getElementById("professor").value = "";
+      document.getElementById("turma").value = "";
+      document.getElementById("data").value = "";
+
+      document.getElementById("dadosProva").style.display = "none";
+      document.getElementById("tituloDados").innerHTML = "📄 Dados da Prova ▶";
+
+      document.getElementById("novaQuestao").style.display = "none";
+      document.getElementById("tituloQuestao").innerHTML = "➕ Nova Questão / Edição ▶";
+
+      limparFormulario();
+      renderizarListaEditor();
+      
+      document.getElementById("menuPrincipal").style.display = "none";
+      document.getElementById("editor").style.display = "block";
+    }
+
+    function voltarMenu() {
+      if (questaoEmEdicaoId !== null) {
+        cancelarEdicao();
+      }
+      document.getElementById("editor").style.display = "none";
+      document.getElementById("bancoQuestoes").style.display = "none";
+      document.getElementById("provasSalvas").style.display = "none";
+      document.getElementById("configuracoes").style.display = "none";
+      document.getElementById("menuPrincipal").style.display = "block";
+    }
+
+    function voltarInicio() {
+      document.getElementById("telaInicial").style.display = "flex";
+      document.getElementById("sistema").style.display = "none";
+      document.getElementById("menuPrincipal").style.display = "block";
+      document.getElementById("editor").style.display = "none";
+    }
+
+    function abrirBancoQuestoes() {
+      renderizarBancoQuestoes();
+      document.getElementById("menuPrincipal").style.display = "none";
+      document.getElementById("bancoQuestoes").style.display = "block";
     }
 
     function abrirProvasSalvas() {
@@ -506,7 +550,8 @@ function alternarCard(id, titulo, texto) {
       `;
 
       document.getElementById("novaQuestao").scrollIntoView({ behavior: 'smooth' });
-        }
+    }
+
     function cancelarEdicao() {
       questaoEmEdicaoId = null;
       limparFormulario();
@@ -598,7 +643,6 @@ function limparFormulario() {
         data: document.getElementById("data").value,
         questoes: questoesArray
       };
-
       let provasSalvas = JSON.parse(localStorage.getItem("provasSalvas") || "[]");
       let index = provasSalvas.findIndex(p => p.id === provaData.id);
       
@@ -732,6 +776,7 @@ function renderizarProvasSalvas() {
         check.closest('.item-salvo').classList.remove("selecionado");
       });
     }
+
     function importarSelecionadas() {
       let marcadas = document.querySelectorAll(".checkQuestao:checked");
 
@@ -898,8 +943,7 @@ function renderizarProvasSalvas() {
       atualizarNavegacao();
       ajustarEscolaMobile();
     }
-
-function criarEstruturaPagina(numPagina) {
+    function criarEstruturaPagina(numPagina) {
       const page = document.createElement('div');
       page.className = 'a4-page';
       page.id = `pagina-a4-${numPagina}`;
