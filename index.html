@@ -228,8 +228,7 @@
           </div>
         </div>
       </div>
-
-      <!-- CARD NOVA QUESTÃO / EDIÇÃO -->
+<!-- CARD NOVA QUESTÃO / EDIÇÃO -->
       <div class="card">
         <div class="card-titulo" id="tituloQuestao" onclick="alternarCard('novaQuestao','tituloQuestao','➕ Nova Questão / Edição')">
           ➕ Nova Questão / Edição ▶
@@ -262,8 +261,9 @@
                 <option value="">Selecione...</option>
                 <option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option><option value="E">E</option>
               </select>
-              </div>
-              <div id="secaoCertoErrado" style="display:none; border: 1px solid #2b6cb0; padding: 12px; border-radius: 6px; margin-bottom: 12px; background: #edf2f7;">
+            </div>
+
+            <div id="secaoCertoErrado" style="display:none; border: 1px solid #2b6cb0; padding: 12px; border-radius: 6px; margin-bottom: 12px; background: #edf2f7;">
               <label for="respostaCE">Gabarito</label>
               <select id="respostaCE">
                 <option value="">Selecione...</option>
@@ -369,52 +369,6 @@
       document.getElementById("editor").style.display = "none";
     }
 
-    function abrirNovaProva() {
-      provaAtualId = Date.now();
-      questoesArray = [];
-      document.getElementById("tituloProva").value = "";
-      document.getElementById("disciplina").value = "";
-      document.getElementById("professor").value = "";
-      document.getElementById("turma").value = "";
-      document.getElementById("data").value = "";
-
-      document.getElementById("dadosProva").style.display = "none";
-      document.getElementById("tituloDados").innerHTML = "📄 Dados da Prova ▶";
-
-      document.getElementById("novaQuestao").style.display = "none";
-      document.getElementById("tituloQuestao").innerHTML = "➕ Nova Questão / Edição ▶";
-
-      limparFormulario();
-      renderizarListaEditor();
-      
-      document.getElementById("menuPrincipal").style.display = "none";
-      document.getElementById("editor").style.display = "block";
-    }
-
-    function voltarMenu() {
-      if (questaoEmEdicaoId !== null) {
-        cancelarEdicao();
-      }
-      document.getElementById("editor").style.display = "none";
-      document.getElementById("bancoQuestoes").style.display = "none";
-      document.getElementById("provasSalvas").style.display = "none";
-      document.getElementById("configuracoes").style.display = "none";
-      document.getElementById("menuPrincipal").style.display = "block";
-    }
-
-    function voltarInicio() {
-      document.getElementById("telaInicial").style.display = "flex";
-      document.getElementById("sistema").style.display = "none";
-      document.getElementById("menuPrincipal").style.display = "block";
-      document.getElementById("editor").style.display = "none";
-    }
-
-    function abrirBancoQuestoes() {
-      renderizarBancoQuestoes();
-      document.getElementById("menuPrincipal").style.display = "none";
-      document.getElementById("bancoQuestoes").style.display = "block";
-    }
-
     function abrirProvasSalvas() {
       renderizarProvasSalvas();
       document.getElementById("menuPrincipal").style.display = "none";
@@ -426,7 +380,7 @@
       document.getElementById("configuracoes").style.display = "block";
     }
 
-    function alternarCard(id, titulo, texto) {
+function alternarCard(id, titulo, texto) {
       let card = document.getElementById(id);
       let t = document.getElementById(titulo);
       if (card.style.display === "none") {
@@ -552,8 +506,7 @@
       `;
 
       document.getElementById("novaQuestao").scrollIntoView({ behavior: 'smooth' });
-    }
-
+        }
     function cancelarEdicao() {
       questaoEmEdicaoId = null;
       limparFormulario();
@@ -563,8 +516,7 @@
         </button>
       `;
     }
-
-    function limparFormulario() {
+function limparFormulario() {
       document.getElementById("titulo").value = "";
       document.getElementById("enunciado").value = "";
       document.getElementById("tipo").value = "dissertativa";
@@ -581,6 +533,7 @@
       document.getElementById("respostaVF").value = "";
       alternarCamposTipo();
     }
+
     function renderizarListaEditor() {
       let lista = document.getElementById("listaQuestoes");
       if (questoesArray.length === 0) {
@@ -659,7 +612,7 @@
       alert("✅ Prova '" + titulo + "' salva com sucesso no dispositivo!");
     }
 
-    function renderizarProvasSalvas() {
+function renderizarProvasSalvas() {
       let lista = document.getElementById("listaProvasSalvas");
       let provasSalvas = JSON.parse(localStorage.getItem("provasSalvas") || "[]");
 
@@ -779,7 +732,6 @@
         check.closest('.item-salvo').classList.remove("selecionado");
       });
     }
-
     function importarSelecionadas() {
       let marcadas = document.querySelectorAll(".checkQuestao:checked");
 
@@ -839,6 +791,7 @@
         renderizarBancoQuestoes();
       }
     }
+
     function excluirTodasQuestoesBanco() {
       if (!confirm("Deseja realmente excluir TODAS as questões do Banco de Questões?")) return;
       if (!confirm("Esta ação é definitiva e não poderá ser desfeita. Deseja continuar?")) return;
@@ -946,7 +899,7 @@
       ajustarEscolaMobile();
     }
 
-    function criarEstruturaPagina(numPagina) {
+function criarEstruturaPagina(numPagina) {
       const page = document.createElement('div');
       page.className = 'a4-page';
       page.id = `pagina-a4-${numPagina}`;
