@@ -129,7 +129,7 @@
     <h0>📚</h0>
     <h1>EDITOR DE ATIVIDADES</h1>
     <h2>Editor Profissional de Atividades</h2>
-    <p>Versão 1.2 - Múltipla Escolha Corrigida</p>
+    <p>Versão 1.3 - Numeração Automática</p>
     <button onclick="abrirSistema()">Entrar</button>
   </div>
 
@@ -236,8 +236,8 @@
         </div>
         <div class="card-conteudo" id="novaQuestao" style="display:none;">
           <div class="editor">
-            <label for="titulo">Título / Número da Questão</label>
-            <input type="text" id="titulo" placeholder="Ex: Questão 1">
+            <label for="titulo">Identificador / Título da Questão (Opcional)</label>
+            <input type="text" id="titulo" placeholder="Ex: Física - Mecânica (Deixe em branco para automáticos)">
 
             <label for="tipo">Tipo de Questão</label>
             <select id="tipo" onchange="alternarCamposTipo()">
@@ -262,9 +262,8 @@
                 <option value="">Selecione...</option>
                 <option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option><option value="E">E</option>
               </select>
-            </div>
-
-            <div id="secaoCertoErrado" style="display:none; border: 1px solid #2b6cb0; padding: 12px; border-radius: 6px; margin-bottom: 12px; background: #edf2f7;">
+              </div>
+              <div id="secaoCertoErrado" style="display:none; border: 1px solid #2b6cb0; padding: 12px; border-radius: 6px; margin-bottom: 12px; background: #edf2f7;">
               <label for="respostaCE">Gabarito</label>
               <select id="respostaCE">
                 <option value="">Selecione...</option>
@@ -302,8 +301,9 @@
               <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: normal;">
                 <input type="checkbox" id="calculo" style="width: auto; margin: 0;"> Incluir campo para cálculos
               </label>
-                                                      </div>
-                                                       <div id="container-btn-salvar">
+            </div>
+
+            <div id="container-btn-salvar">
               <button class="btn" id="btnSalvarQuestao" style="background:#1b365d; color:white; width:100%; padding: 12px; font-size: 11pt;" onclick="adicionarOuSalvarQuestao()">
                 ➕ Adicionar Questão
               </button>
@@ -354,7 +354,6 @@
       </div>
     </div>
 
-  </div>
   </div>
 
   <script>
@@ -448,8 +447,40 @@
       document.getElementById("secaoLinhas").style.display = tipo === "dissertativa" ? "block" : "none";
     }
 
+    function gerarHtmlQuestao(q, numeroAuto = null) {
+      let prefixoTitulo = numeroAuto !== null ? `QUESTÃO ${numeroAuto}` : (q.titulo || "QUESTÃO");
+      let html = `<div class='questao-titulo'>${prefixoTitulo}</div><p>${q.enunciado}</p>`;
+
+      if (q.tipo === "multipla") {
+        html += `<div class="alternativas-lista">`;
+        html += `<div class="alternativa-item">a) ( &nbsp; ) ${q.altA || ''}</div>`;
+        html += `<div class="alternativa-item">b) ( &nbsp; ) ${q.altB || ''}</div>`;
+        html += `<div class="alternativa-item">c) ( &nbsp; ) ${q.altC || ''}</div>`;
+        html += `<div class="alternativa-item">d) ( &nbsp; ) ${q.altD || ''}</div>`;
+        html += `<div class="alternativa-item">e) ( &nbsp; ) ${q.altE || ''}</div>`;
+        html += `</div>`;
+      } else if (q.tipo === "ce") {
+        html += "<p>CERTO ( ) &nbsp;&nbsp; ERRADO ( )</p>";
+      } else if (q.tipo === "vf") {
+        html += "<p>VERDADEIRO ( ) &nbsp;&nbsp; FALSO ( )</p>";
+      }
+
+      if (q.tipo === "dissertativa") {
+        let linhas = parseInt(q.espaco || 0);
+        for (let i = 0; i < linhas; i++) {
+          html += "<div style='border-bottom:1px solid #999;height:22px'></div>";
+        }
+      }
+
+      if (q.calculo) {
+        html += "<br><strong>Cálculos:</strong><div style='height:140px;border:1px dashed #444;margin-top:5px'></div>";
+      }
+
+      return html;
+    }
+
     function adicionarOuSalvarQuestao() {
-      let titulo = document.getElementById("titulo").value || "Questão";
+      let titulo = document.getElementById("titulo").value.trim();
       let enunciado = document.getElementById("enunciado").value;
       let tipo = document.getElementById("tipo").value;
       let gabarito = document.getElementById("gabarito").value;
@@ -465,41 +496,14 @@
       let respostaCE = document.getElementById("respostaCE").value;
       let respostaVF = document.getElementById("respostaVF").value;
 
-      let html = `<div class='questao-titulo'>${titulo}</div><p>${enunciado}</p>`;
-
-      if (tipo === "multipla") {
-        html += `<div class="alternativas-lista">`;
-        html += `<div class="alternativa-item">a) ( &nbsp; ) ${altA}</div>`;
-        html += `<div class="alternativa-item">b) ( &nbsp; ) ${altB}</div>`;
-        html += `<div class="alternativa-item">c) ( &nbsp; ) ${altC}</div>`;
-        html += `<div class="alternativa-item">d) ( &nbsp; ) ${altD}</div>`;
-        html += `<div class="alternativa-item">e) ( &nbsp; ) ${altE}</div>`;
-        html += `</div>`;
-        if (corretaMultipla) gabarito = "Alternativa " + corretaMultipla;
-      } else if (tipo === "ce") {
-        html += "<p>CERTO ( ) &nbsp;&nbsp; ERRADO ( )</p>";
-        if (respostaCE) gabarito = respostaCE;
-      } else if (tipo === "vf") {
-        html += "<p>VERDADEIRO ( ) &nbsp;&nbsp; FALSO ( )</p>";
-        if (respostaVF) gabarito = respostaVF;
-      }
-
-      if (tipo === "dissertativa") {
-        let linhas = parseInt(espaco);
-        for (let i = 0; i < linhas; i++) {
-          html += "<div style='border-bottom:1px solid #999;height:22px'></div>";
-        }
-      }
-
-      if (calculo) {
-        html += "<br><strong>Cálculos:</strong><div style='height:140px;border:1px dashed #444;margin-top:5px'></div>";
-      }
+      if (tipo === "multipla" && corretaMultipla) gabarito = "Alternativa " + corretaMultipla;
+      if (tipo === "ce" && respostaCE) gabarito = respostaCE;
+      if (tipo === "vf" && respostaVF) gabarito = respostaVF;
 
       let dadosQuestao = {
         id: questaoEmEdicaoId !== null ? questaoEmEdicaoId : Date.now(),
         titulo, enunciado, tipo, gabarito, espaco, calculo,
-        altA, altB, altC, altD, altE, corretaMultipla, respostaCE, respostaVF,
-        htmlContent: html
+        altA, altB, altC, altD, altE, corretaMultipla, respostaCE, respostaVF
       };
 
       if (questaoEmEdicaoId !== null) {
@@ -549,6 +553,7 @@
 
       document.getElementById("novaQuestao").scrollIntoView({ behavior: 'smooth' });
     }
+
     function cancelarEdicao() {
       questaoEmEdicaoId = null;
       limparFormulario();
@@ -576,7 +581,6 @@
       document.getElementById("respostaVF").value = "";
       alternarCamposTipo();
     }
-
     function renderizarListaEditor() {
       let lista = document.getElementById("listaQuestoes");
       if (questoesArray.length === 0) {
@@ -584,15 +588,15 @@
         return;
       }
       lista.innerHTML = "";
-      questoesArray.forEach(q => {
+      questoesArray.forEach((q, idx) => {
         let item = document.createElement("div");
         item.style.borderBottom = "1px solid #ddd";
         item.style.padding = "10px 0";
         item.innerHTML = `
           <div style="display:flex;justify-content:space-between;align-items:center;">
             <div>
-              <strong>${q.titulo}</strong><br>
-              <small style="color:#666;">Tipo: ${q.tipo}</small>
+              <strong>Questão ${idx + 1}</strong> <small style="color:#666;">(${q.tipo})</small><br>
+              <small style="color:#555;">${q.enunciado ? q.enunciado.substring(0, 40) : ''}...</small>
             </div>
             <div>
               <button class="btn-edit" onclick="editarQuestao(${q.id})">✏️ Editar</button>
@@ -681,7 +685,6 @@
         lista.appendChild(div);
       });
     }
-
     function carregarProva(id) {
       let provasSalvas = JSON.parse(localStorage.getItem("provasSalvas") || "[]");
       let prova = provasSalvas.find(p => p.id === id);
@@ -700,6 +703,7 @@
       document.getElementById("provasSalvas").style.display = "none";
       document.getElementById("editor").style.display = "block";
     }
+
     function excluirProvaSalva(id) {
       if (confirm("Deseja realmente apagar esta prova do dispositivo?")) {
         let provasSalvas = JSON.parse(localStorage.getItem("provasSalvas") || "[]");
@@ -738,7 +742,7 @@
           <div style="display:flex; align-items:center; gap:12px; flex:1;">
             <input type="checkbox" class="checkQuestao" value="${q.id}" style="transform:scale(1.3); margin-right:5px; cursor:pointer;">
             <div>
-              <strong>${q.titulo}</strong> - <small>${q.tipo}</small><br>
+              <strong>${q.titulo || 'Questão'}</strong> - <small>${q.tipo}</small><br>
               <small style="color:#666;">
                 ${q.enunciado ? q.enunciado.substring(0,50) : ""}...
               </small>
@@ -768,6 +772,7 @@
         check.closest('.item-salvo').classList.add("selecionado");
       });
     }
+
     function desmarcarTodasQuestoes() {
       document.querySelectorAll(".checkQuestao").forEach(check => {
         check.checked = false;
@@ -834,7 +839,6 @@
         renderizarBancoQuestoes();
       }
     }
-
     function excluirTodasQuestoesBanco() {
       if (!confirm("Deseja realmente excluir TODAS as questões do Banco de Questões?")) return;
       if (!confirm("Esta ação é definitiva e não poderá ser desfeita. Deseja continuar?")) return;
@@ -882,7 +886,7 @@
       }
     }
 
-    /* PAGINAÇÃO REVISADA */
+    /* PAGINAÇÃO COM NUMERAÇÃO AUTOMÁTICA */
     function paginarDocumento() {
       const containerDoc = document.getElementById('documento-paginado');
       containerDoc.innerHTML = '';
@@ -904,14 +908,14 @@
       wrapper.className = 'page-wrapper';
       wrapper.appendChild(novaPagina);
       containerDoc.appendChild(wrapper);
-      
+
       let colunas = novaPagina.querySelector('.columns-container');
       let alturaAcumulada = 0;
 
-      questoesArray.forEach((q) => {
+      questoesArray.forEach((q, idx) => {
         const questaoElem = document.createElement("div");
         questaoElem.className = "questao";
-        questaoElem.innerHTML = q.htmlContent;
+        questaoElem.innerHTML = gerarHtmlQuestao(q, idx + 1);
 
         colunas.appendChild(questaoElem);
         const alturaQuestao = questaoElem.offsetHeight || 120;
@@ -968,7 +972,7 @@
         headerHtml = `
           <div class="header-bar">
             <h1>${tituloVal}</h1>
-            <p>${disciplinaVal} • Folha ${numPagina}</p>
+            <p>${disciplinaVal}</p>
           </div>
           <div class="student-info">
             <table>
@@ -1001,7 +1005,6 @@
       `;
       return page;
     }
-
     function atualizarNavegacao() {
       const paginas = document.querySelectorAll('.a4-page');
       const indicator = document.getElementById('page-indicator');
@@ -1056,18 +1059,16 @@
         }
       });
     }
+
     function abrirVisualizacao() {
-      // 1. Esconde as outras seções
       document.getElementById("editor").style.display = "none";
       document.getElementById("bancoQuestoes").style.display = "none";
       document.getElementById("provasSalvas").style.display = "none";
       document.getElementById("configuracoes").style.display = "none";
       document.getElementById("menuPrincipal").style.display = "none";
 
-      // 2. Torna visível a tela de visualização
       document.getElementById("visualizacaoProva").style.display = "block";
 
-      // 3. Força a paginação com os elementos visíveis
       paginaAtual = 0;
       paginarDocumento();
       window.scrollTo(0, 0);
