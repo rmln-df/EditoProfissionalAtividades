@@ -228,7 +228,8 @@
           </div>
         </div>
       </div>
-<!-- CARD NOVA QUESTÃO / EDIÇÃO -->
+
+      <!-- CARD NOVA QUESTÃO / EDIÇÃO -->
       <div class="card">
         <div class="card-titulo" id="tituloQuestao" onclick="alternarCard('novaQuestao','tituloQuestao','➕ Nova Questão / Edição')">
           ➕ Nova Questão / Edição ▶
@@ -301,9 +302,8 @@
               <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: normal;">
                 <input type="checkbox" id="calculo" style="width: auto; margin: 0;"> Incluir campo para cálculos
               </label>
-            </div>
-
-            <div id="container-btn-salvar">
+                                                      </div>
+                                                       <div id="container-btn-salvar">
               <button class="btn" id="btnSalvarQuestao" style="background:#1b365d; color:white; width:100%; padding: 12px; font-size: 11pt;" onclick="adicionarOuSalvarQuestao()">
                 ➕ Adicionar Questão
               </button>
@@ -370,13 +370,6 @@
       document.getElementById("editor").style.display = "none";
     }
 
-    function abrirNovaProva() {
-      provaAtualId = Date.now();
-      questoesArray = [];
-      document.getElementById("tituloProva").value = "";
-      document.getElementById("disciplina").value = "";
-      document.getElementById("professor").value = "";
-      document.getElementById("turma").value = "";
     function abrirNovaProva() {
       provaAtualId = Date.now();
       questoesArray = [];
@@ -556,7 +549,6 @@
 
       document.getElementById("novaQuestao").scrollIntoView({ behavior: 'smooth' });
     }
-
     function cancelarEdicao() {
       questaoEmEdicaoId = null;
       limparFormulario();
@@ -584,7 +576,8 @@
       document.getElementById("respostaVF").value = "";
       alternarCamposTipo();
     }
-      function renderizarListaEditor() {
+
+    function renderizarListaEditor() {
       let lista = document.getElementById("listaQuestoes");
       if (questoesArray.length === 0) {
         lista.innerHTML = '<p style="color:#777;text-align:center;">Nenhuma questão adicionada.</p>';
@@ -775,7 +768,6 @@
         check.closest('.item-salvo').classList.add("selecionado");
       });
     }
-
     function desmarcarTodasQuestoes() {
       document.querySelectorAll(".checkQuestao").forEach(check => {
         check.checked = false;
@@ -1137,7 +1129,7 @@
       }
     });
 
-  window.onload = function() {
+    window.onload = function() {
       ajustarEscolaMobile();
     };
 
