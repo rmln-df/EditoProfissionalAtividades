@@ -93,7 +93,26 @@
     .card { background: #fff; margin: 18px auto; border-radius: 14px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,.15); width: 210mm; max-width: 95%; }
     .card-titulo { background: #1b365d; color: #fff; padding: 15px; font-size: 20px; font-weight: bold; cursor: pointer; }
     .card-conteudo { padding: 20px; }
-    .item-salvo { border: 1px solid #e2e8f0; padding: 12px; border-radius: 8px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; background: #f8fafc; }
+    .item-salvo { 
+      border-left: 6px solid #2b6cb0;
+      border-top: 1px solid #dbeafe;
+      border-right: 1px solid #dbeafe;
+      border-bottom: 1px solid #dbeafe; 
+      padding: 12px; 
+      border-radius: 12px; 
+      margin-bottom: 10px; 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+      background: linear-gradient(135deg, #eaf2ff, #cfe3ff); 
+      box-shadow: 0 3px 10px rgba(0,0,0,.08);
+      transition: .25s; 
+    }
+    .item-salvo.selecionado {
+      background: linear-gradient(135deg,#dbeafe,#bfdbfe);
+      border-left: 6px solid #2563eb;
+      box-shadow: 0 6px 15px rgba(37,99,235,.25);
+    }
     
     @media(max-width: 768px) {
       .card, #menuPrincipal { width: 95%; margin: 10px auto; border-radius: 10px; }
@@ -117,7 +136,7 @@
   <div id="sistema" style="display:none; width: 100%;">
 
     <div id="menuPrincipal">
-      <h2>📚 GABARITA AI</h2>
+      <h2>📚 EDITOR DE ATIVIDADES</h2>
       <p>Editor Profissional de Avaliações</p>
       <button onclick="abrirNovaProva()">📄 Nova Prova</button>
       <button onclick="abrirBancoQuestoes()">📚 Banco de Questões</button>
@@ -131,10 +150,19 @@
       <div class="card">
         <div class="card-titulo">📚 Banco de Questões (Salvas no Aparelho)</div>
         <div class="card-conteudo">
+          
+          <!-- PAINEL DE AÇÕES EM LOTE NO TOPO -->
+          <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:15px; padding:12px; background:#e6edf7; border:1px solid #b8c7df; border-radius:8px;">
+            <button class="btn" onclick="selecionarTodasQuestoes()" style="background:#2b6cb0; color:white;">☑️ Selecionar Todas</button>
+            <button class="btn" onclick="desmarcarTodasQuestoes()" style="background:#718096; color:white;">⬜ Desmarcar Todas</button>
+            <button class="btn" onclick="importarSelecionadas()" style="background:#38a169; color:white;">➕ Importar Selecionadas</button>
+            <button class="btn" onclick="excluirSelecionadas()" style="background:#c53030; color:white;">🗑️ Excluir Selecionadas</button>
+          </div>
+
           <div id="listaBancoQuestoes"></div>
           
           <button onclick="excluirTodasQuestoesBanco()" class="btn" style="background:#c53030; color:white; width:100%; padding:12px; margin-top:15px; margin-bottom:10px;">
-            🗑 Excluir Todas as Questões
+            🗑 Excluir TODAS as Questões do Banco
           </button>
 
           <button onclick="voltarMenu()" class="btn" style="background:#1b365d; color:white; width: 100%; padding: 12px; margin-top: 15px;">⬅ Voltar ao Menu</button>
@@ -200,8 +228,7 @@
           </div>
         </div>
       </div>
-
-      <!-- CARD NOVA QUESTÃO / EDIÇÃO -->
+<!-- CARD NOVA QUESTÃO / EDIÇÃO -->
       <div class="card">
         <div class="card-titulo" id="tituloQuestao" onclick="alternarCard('novaQuestao','tituloQuestao','➕ Nova Questão / Edição')">
           ➕ Nova Questão / Edição ▶
@@ -285,20 +312,27 @@
         </div>
       </div>
 
-      <div style="width: 210mm; max-width: 95%; margin: 0 auto 18px auto;">
-        <button class="btn" style="background:#1b365d; color:white; width:100%; padding: 14px; font-size: 11pt; border-radius: 10px;" onclick="voltarMenu()">
-          ⬅ Voltar ao Menu
-        </button>
-      </div>
-
+      <!-- CARD QUESTÕES ADICIONADAS -->
       <div class="card">
         <div class="card-titulo">📋 Questões Adicionadas</div>
         <div class="card-conteudo">
           <div id="listaQuestoes"><p style="color:#777;text-align:center;">Nenhuma questão adicionada.</p></div>
-          <button onclick="abrirVisualizacao()" style="width:100%; margin-top:15px; padding:15px; font-size:18px; background:#2b6cb0; color:white; border:none; border-radius:10px; cursor:pointer; font-weight:bold;">
-            👁 Visualizar Folhas (Estilo Word)
-          </button>
+          
+          <div style="display: flex; gap: 10px; margin-top: 15px;">
+            <button onclick="limparTodasQuestoesProva()" class="btn" style="flex:1; padding:12px; background:#c53030; color:white; font-weight:bold;">
+              🗑️ Esvaziar Prova
+            </button>
+            <button onclick="abrirVisualizacao()" class="btn" style="flex:2; padding:12px; background:#2b6cb0; color:white; font-weight:bold; font-size:11pt;">
+              👁️ Visualizar Folhas
+            </button>
+          </div>
         </div>
+      </div>
+
+      <div style="width: 210mm; max-width: 95%; margin: 0 auto 18px auto;">
+        <button class="btn" style="background:#1b365d; color:white; width:100%; padding: 14px; font-size: 11pt; border-radius: 10px;" onclick="voltarMenu()">
+          ⬅ Voltar ao Menu
+        </button>
       </div>
 
     </div>
@@ -320,6 +354,7 @@
       </div>
     </div>
 
+  </div>
   </div>
 
   <script>
@@ -352,7 +387,6 @@
 
       limparFormulario();
       renderizarListaEditor();
-      paginarDocumento();
       
       document.getElementById("menuPrincipal").style.display = "none";
       document.getElementById("editor").style.display = "block";
@@ -479,10 +513,8 @@
 
       salvarQuestaoNoBanco(dadosQuestao);
       renderizarListaEditor();
-      paginarDocumento();
     }
-
-    function editarQuestao(id) {
+function editarQuestao(id) {
       let q = questoesArray.find(item => item.id === id);
       if (!q) return;
 
@@ -577,7 +609,19 @@
         if (questaoEmEdicaoId === id) cancelarEdicao();
         questoesArray = questoesArray.filter(q => q.id !== id);
         renderizarListaEditor();
-        paginarDocumento();
+      }
+    }
+
+    function limparTodasQuestoesProva() {
+      if (questoesArray.length === 0) {
+        alert("A prova já está vazia.");
+        return;
+      }
+
+      if (confirm("Deseja remover TODAS as questões da prova atual? (As questões do Banco de Questões continuarão salvas)")) {
+        questoesArray = [];
+        renderizarListaEditor();
+        alert("Todas as questões foram removidas da prova atual.");
       }
     }
 
@@ -652,12 +696,10 @@
       questoesArray = prova.questoes || [];
 
       renderizarListaEditor();
-      paginarDocumento();
 
       document.getElementById("provasSalvas").style.display = "none";
       document.getElementById("editor").style.display = "block";
     }
-
     function excluirProvaSalva(id) {
       if (confirm("Deseja realmente apagar esta prova do dispositivo?")) {
         let provasSalvas = JSON.parse(localStorage.getItem("provasSalvas") || "[]");
@@ -666,6 +708,7 @@
         renderizarProvasSalvas();
       }
     }
+
     function salvarQuestaoNoBanco(questao) {
       let banco = JSON.parse(localStorage.getItem("bancoQuestoes") || "[]");
       let index = banco.findIndex(q => q.id === questao.id);
@@ -677,6 +720,7 @@
       localStorage.setItem("bancoQuestoes", JSON.stringify(banco));
     }
 
+    /* RENDERIZAÇÃO DO BANCO */
     function renderizarBancoQuestoes() {
       let lista = document.getElementById("listaBancoQuestoes");
       let banco = JSON.parse(localStorage.getItem("bancoQuestoes") || "[]");
@@ -691,39 +735,95 @@
         let div = document.createElement("div");
         div.className = "item-salvo";
         div.innerHTML = `
-          <div>
-            <strong>${q.titulo}</strong> - <small>${q.tipo}</small><br>
-            <small style="color:#666;">${q.enunciado ? q.enunciado.substring(0, 50) : ''}...</small>
+          <div style="display:flex; align-items:center; gap:12px; flex:1;">
+            <input type="checkbox" class="checkQuestao" value="${q.id}" style="transform:scale(1.3); margin-right:5px; cursor:pointer;">
+            <div>
+              <strong>${q.titulo}</strong> - <small>${q.tipo}</small><br>
+              <small style="color:#666;">
+                ${q.enunciado ? q.enunciado.substring(0,50) : ""}...
+              </small>
+            </div>
           </div>
           <div>
-            <button class="btn" style="background:#2b6cb0; color:white;" onclick="importarQuestaoParaProva(${q.id})">➕ Importar p/ Prova</button>
             <button class="btn-delete" onclick="excluirQuestaoBanco(${q.id})">🗑 Excluir</button>
           </div>
         `;
         lista.appendChild(div);
+
+        let check = div.querySelector(".checkQuestao");
+        check.addEventListener("change", function() {
+          if (this.checked) {
+            div.classList.add("selecionado");
+          } else {
+            div.classList.remove("selecionado");
+          }
+        });
       });
     }
 
-    function importarQuestaoParaProva(id) {
-      let banco = JSON.parse(localStorage.getItem("bancoQuestoes") || "[]");
-      let q = banco.find(item => item.id === id);
-      if (!q) return;
+    /* FUNÇÕES EM LOTE PARA O BANCO DE QUESTÕES */
+    function selecionarTodasQuestoes() {
+      document.querySelectorAll(".checkQuestao").forEach(check => {
+        check.checked = true;
+        check.closest('.item-salvo').classList.add("selecionado");
+      });
+    }
 
-      if (!provaAtualId) {
-        provaAtualId = Date.now();
+    function desmarcarTodasQuestoes() {
+      document.querySelectorAll(".checkQuestao").forEach(check => {
+        check.checked = false;
+        check.closest('.item-salvo').classList.remove("selecionado");
+      });
+    }
+
+    function importarSelecionadas() {
+      let marcadas = document.querySelectorAll(".checkQuestao:checked");
+
+      if (marcadas.length === 0) {
+        alert("Selecione pelo menos uma questão.");
+        return;
       }
 
-      let novaQuestao = JSON.parse(JSON.stringify(q));
-      novaQuestao.id = Date.now();
-      questoesArray.push(novaQuestao);
+      let banco = JSON.parse(localStorage.getItem("bancoQuestoes") || "[]");
+
+      marcadas.forEach(check => {
+        let id = Number(check.value);
+        let q = banco.find(x => x.id === id);
+
+        if (q) {
+          let novaQuestao = JSON.parse(JSON.stringify(q));
+          novaQuestao.id = Date.now() + Math.floor(Math.random() * 100000);
+          questoesArray.push(novaQuestao);
+        }
+      });
 
       renderizarListaEditor();
-      paginarDocumento();
 
       document.getElementById("bancoQuestoes").style.display = "none";
       document.getElementById("editor").style.display = "block";
 
-      alert("Questão importada com sucesso!");
+      alert(marcadas.length + " questão(ões) importada(s) com sucesso!");
+    }
+function excluirSelecionadas() {
+      let selecionadas = document.querySelectorAll(".checkQuestao:checked");
+
+      if (selecionadas.length === 0) {
+        alert("Selecione pelo menos uma questão.");
+        return;
+      }
+
+      if (!confirm("Deseja excluir " + selecionadas.length + " questão(ões)?")) {
+        return;
+      }
+
+      let banco = JSON.parse(localStorage.getItem("bancoQuestoes") || "[]");
+      let ids = Array.from(selecionadas).map(check => Number(check.value));
+
+      banco = banco.filter(q => !ids.includes(Number(q.id)));
+      localStorage.setItem("bancoQuestoes", JSON.stringify(banco));
+
+      renderizarBancoQuestoes();
+      alert("Questões excluídas com sucesso!");
     }
 
     function excluirQuestaoBanco(id) {
@@ -736,17 +836,11 @@
     }
 
     function excluirTodasQuestoesBanco() {
-      if (!confirm("Deseja realmente excluir TODAS as questões do Banco de Questões?")) {
-        return;
-      }
-
-      if (!confirm("Esta ação é definitiva e não poderá ser desfeita. Deseja continuar?")) {
-        return;
-      }
+      if (!confirm("Deseja realmente excluir TODAS as questões do Banco de Questões?")) return;
+      if (!confirm("Esta ação é definitiva e não poderá ser desfeita. Deseja continuar?")) return;
 
       localStorage.removeItem("bancoQuestoes");
       renderizarBancoQuestoes();
-
       alert("✅ Todas as questões foram excluídas.");
     }
 
@@ -788,7 +882,7 @@
       }
     }
 
-    /* PAGINAÇÃO REVISADA E CORRIGIDA */
+    /* PAGINAÇÃO REVISADA */
     function paginarDocumento() {
       const containerDoc = document.getElementById('documento-paginado');
       containerDoc.innerHTML = '';
@@ -962,10 +1056,18 @@
         }
       });
     }
-
     function abrirVisualizacao() {
+      // 1. Esconde as outras seções
       document.getElementById("editor").style.display = "none";
+      document.getElementById("bancoQuestoes").style.display = "none";
+      document.getElementById("provasSalvas").style.display = "none";
+      document.getElementById("configuracoes").style.display = "none";
+      document.getElementById("menuPrincipal").style.display = "none";
+
+      // 2. Torna visível a tela de visualização
       document.getElementById("visualizacaoProva").style.display = "block";
+
+      // 3. Força a paginação com os elementos visíveis
       paginaAtual = 0;
       paginarDocumento();
       window.scrollTo(0, 0);
@@ -1028,7 +1130,6 @@
     });
 
     window.onload = function() {
-      paginarDocumento();
       ajustarEscolaMobile();
     };
 
