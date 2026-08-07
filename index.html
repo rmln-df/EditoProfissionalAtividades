@@ -1112,10 +1112,12 @@
   btn.innerText = "⏳ Gerando PDF...";
   btn.disabled = true;
 
-  // Seleciona todas as páginas geradas na tela
+  // Garante o scroll no topo para o html2canvas não capturar tela preta/branca por deslocamento
+  window.scrollTo(0, 0);
+
   const paginas = document.querySelectorAll(".a4-page");
   if (!paginas || paginas.length === 0) {
-    alert("Nenhuma página encontrada para exportar.");
+    alert("Nenhuma página encontrada.");
     btn.innerText = "📥 Baixar PDF";
     btn.disabled = false;
     return;
@@ -1125,74 +1127,83 @@
   const nomeArquivo = `${titulo.toLowerCase().replace(/\s+/g, '_')}.pdf`;
 
   try {
-    // 1. Instância do jsPDF (Orientação Retrato, Unidade milímetros, Formato A4)
-    const { jsPDF } = window.jspdf || {};
-    if (!jsPDF && typeof html2pdf === "undefined") {
-      throw new Error("Biblioteca PDF não carregada.");
-    }
-
-    // Inicializa documento jsPDF
+    // 1. Instancia o jsPDF
     const pdf = new jspdf.jsPDF('p', 'mm', 'a4');
 
     for (let i = 0; i < paginas.length; i++) {
       const pagina = paginas[i];
       const wrapper = pagina.parentElement;
 
-      // Guardar os estilos originais para restaurar depois
-      const transformOriginal = pagina.style.transform;
-      const displayOriginal = pagina.style.display;
-      const widthWrapperOriginal = wrapper ? wrapper.style.width : '';
-      const heightWrapperOriginal = wrapper ? wrapper.style.height : '';
+      // Guarda os estilos visuais originais
+      const transformOrig = pagina.style.transform;
+      const displayOrig = pagina.style.display;
+      const positionOrig = pagina.style.position;
+      const wrapperWidthOrig = wrapper ? wrapper.style.width : '';
+      const wrapperHeightOrig = wrapper ? wrapper.style.height : '';
 
-      // 2. Prepara a folha visível sem transform para a foto ficar perfeita
-      pagina.style.transform = "none";
+      // 2. FORÇA A PÁGINA A FICAR VISÍVEL E NO TAMANHO A4 REAL NA TELA
       pagina.style.display = "block";
+      pagina.style.transform = "none";
+      pagina.style.position = "relative";
+      pagina.style.opacity = "1";
+      pagina.style.visibility = "visible";
+      
       if (wrapper) {
+        wrapper.style.display = "block";
         wrapper.style.width = "210mm";
         wrapper.style.height = "297mm";
       }
 
-      // 3. Captura a folha real visível na tela em alta definição
+      // 3. PAUSA ESSENCIAL: Aguarda 150ms para o Android desenhar o DOM visível
+      await new Promise(resolve => setTimeout(resolve, 150));
+
+      // 4. Captura o canvas da folha agora 100% visível
       const canvas = await html2canvas(pagina, {
         scale: 2,
         useCORS: true,
         logging: false,
         backgroundColor: "#ffffff",
-        windowWidth: 794 // Força largura padrão de A4
+        scrollX: 0,
+        scrollY: 0,
+        windowWidth: 794
       });
 
-      // 4. Restaura imediatamente o estilo mobile da tela
-      pagina.style.transform = transformOriginal;
-      pagina.style.display = displayOriginal;
+      // 5. Restaura imediatamente os estilos originais para não desconfigurar a interface
+      pagina.style.transform = transformOrig;
+      pagina.style.display = displayOrig;
+      pagina.style.position = positionOrig;
       if (wrapper) {
-        wrapper.style.width = widthWrapperOriginal;
-        wrapper.style.height = heightWrapperOriginal;
+        wrapper.style.display = "";
+        wrapper.style.width = wrapperWidthOrig;
+        wrapper.style.height = wrapperHeightOrig;
       }
 
-      // Converte o canvas capturado em imagem JPEG
+      // Converte para imagem
       const imgData = canvas.toDataURL('image/jpeg', 0.98);
 
-      // 5. Adiciona a imagem no PDF (se for a partir da 2ª folha, cria uma nova página no PDF)
+      // Se for a partir da 2ª página, cria nova folha no PDF
       if (i > 0) {
         pdf.addPage('a4', 'p');
       }
 
-      // Insere a imagem cobrindo exatamente 210mm x 297mm (folha A4 completa)
+      // Desenha na folha A4 (210mm x 297mm)
+      pdf.save; // Garante referência limpa
       pdf.addImage(imgData, 'JPEG', 0, 0, 210, 297);
     }
 
-    // 6. Baixa o arquivo completo com todas as páginas
+    // Save final com todas as folhas incluídas
     pdf.save(nomeArquivo);
 
   } catch (erro) {
-    console.error("Erro na geração do PDF:", erro);
-    alert("Houve um problema ao gerar o PDF no dispositivo. Tente novamente.");
+    console.error("Erro ao gerar PDF:", erro);
+    alert("Ocorreu um erro ao gerar o PDF. Verifique os dados e tente novamente.");
   } finally {
     btn.innerText = "📥 Baixar PDF";
     btn.disabled = false;
-    ajustarEscolaMobile(); // Garante o alinhamento visual da tela após fechar
+    ajustarEscolaMobile(); // Reajusta a visualização da tela
   }
-    }
+          }
+    
         
     
     window.addEventListener('scroll', function() {
