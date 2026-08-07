@@ -1080,11 +1080,13 @@
 
                 /* GERAÇÃO DE PDF ISOLADA FOLHA POR FOLHA (SEM CORTES E SEM ENCAVALAR) */
     async function gerarPDFDireto() {
+         /* GERAÇÃO DE PDF MULTI-PÁGINAS NATIVA (SEM ERROS E SEM ENCAVALAR) */
+    async function gerarPDFDireto() {
       const btn = document.getElementById("btnDownloadPDF");
       btn.innerText = "⏳ Gerando PDF...";
       btn.disabled = true;
 
-      const paginas = document.querySelectorAll(".a4-page");
+      const paginas = Array.from(document.querySelectorAll(".a4-page"));
       if (paginas.length === 0) {
         alert("Nenhuma página para gerar.");
         btn.innerText = "📥 Baixar PDF";
@@ -1096,74 +1098,68 @@
       const nomeArquivo = `${titulo.toLowerCase().replace(/\s+/g, '_')}.pdf`;
 
       try {
-        const { jsPDF } = window.jspdf || { jsPDF: window.jsPDF };
-        const pdf = new jsPDF({
-          orientation: 'portrait',
-          unit: 'mm',
-          format: 'a4',
-          compress: true
+        // Guarda os estados visuais originais
+        const estilosOriginais = paginas.map(p => ({
+          display: p.style.display,
+          transform: p.style.transform,
+          margin: p.style.margin
+        }));
+
+        // Cria a instância base do html2pdf
+        let worker = html2pdf().set({
+          margin: 0,
+          filename: nomeArquivo,
+          image: { type: 'jpeg', quality: 0.98 },
+          html2canvas: { scale: 2, useCORS: true, logging: false, scrollX: 0, scrollY: 0 },
+          jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
         });
 
-        // Loop por cada folha criada
+        // Oculta todas as páginas
+        paginas.forEach(p => {
+          p.style.display = "none";
+          p.style.transform = "none";
+          p.style.margin = "0";
+        });
+
+        // Adiciona uma página por vez ao renderizador PDF
         for (let i = 0; i < paginas.length; i++) {
-          const paginaOriginal = paginas[i];
+          const pagina = paginas[i];
+          
+          // Exibe apenas a página atual
+          pagina.style.display = "block";
 
-          // 1. Cria um container temporário e limpo no corpo do documento
-          const containerTemp = document.createElement("div");
-          containerTemp.style.position = "fixed";
-          containerTemp.style.left = "-9999px";
-          containerTemp.style.top = "0";
-          containerTemp.style.width = "794px";
-          containerTemp.style.height = "1123px";
-          containerTemp.style.backgroundColor = "#ffffff";
-          containerTemp.style.zIndex = "-9999";
-          containerTemp.style.overflow = "hidden";
-
-          // 2. Clona a página para não sofrer interferências de scroll ou escala mobile
-          const clonePagina = paginaOriginal.cloneNode(true);
-          clonePagina.style.transform = "none";
-          clonePagina.style.margin = "0";
-          clonePagina.style.boxSizing = "border-box";
-          clonePagina.style.width = "794px";
-          clonePagina.style.height = "1123px";
-
-          containerTemp.appendChild(clonePagina);
-          document.body.appendChild(containerTemp);
-
-          // 3. Captura o snapshot exato da folha isolada
-          const canvas = await html2canvas(clonePagina, {
-            scale: 2,
-            useCORS: true,
-            logging: false,
-            width: 794,
-            height: 1123,
-            windowWidth: 794,
-            windowHeight: 1123
-          });
-
-          // Remove o elemento temporário da memória
-          document.body.removeChild(containerTemp);
-
-          const imgData = canvas.toDataURL('image/jpeg', 0.98);
-
-          if (i > 0) {
-            pdf.addPage('a4', 'portrait');
+          if (i === 0) {
+            worker = worker.from(pagina).toPdf();
+          } else {
+            worker = worker.toPdf().get('pdf').then(pdf => {
+              pdf.addPage('a4', 'portrait');
+            }).from(pagina).toContainer().toCanvas().toPdf();
           }
 
-          // Adiciona a imagem cobrindo exatamente os 210x297mm do A4
-          pdf.addImage(imgData, 'JPEG', 0, 0, 210, 297);
+          // Esconde novamente para processar a próxima limpa
+          pagina.style.display = "none";
         }
 
-        pdf.save(nomeArquivo);
+        // Salva o PDF final
+        await worker.save();
+
+        // Restaura a visualização da tela
+        paginas.forEach((p, idx) => {
+          p.style.display = estilosOriginais[idx].display;
+          p.style.transform = estilosOriginais[idx].transform;
+          p.style.margin = estilosOriginais[idx].margin;
+        });
+
       } catch (err) {
         console.error(err);
-        alert("Erro ao processar o PDF. Verifique os dados e tente novamente.");
+        alert("Ocorreu um erro ao gerar o arquivo. Tente novamente.");
       } finally {
         btn.innerText = "📥 Baixar PDF";
         btn.disabled = false;
         ajustarEscolaMobile();
       }
-    }
+                                             }
+        
   
     window.addEventListener('scroll', function() {
       const vis = document.getElementById("visualizacaoProva");
