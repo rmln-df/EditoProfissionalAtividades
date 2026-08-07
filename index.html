@@ -1078,51 +1078,78 @@
       document.getElementById("editor").style.display = "block";
     }
 
-        /* GERAÇÃO DE PDF MULTI-PÁGINAS CORRIGIDA */
-    function gerarPDFDireto() {
-      const elemento = document.getElementById("documento-paginado");
+            /* GERAÇÃO DE PDF PÁGINA A PÁGINA (SEM PÁGINAS EM BRANCO) */
+    async function gerarPDFDireto() {
       const btn = document.getElementById("btnDownloadPDF");
-      
       btn.innerText = "⏳ Gerando PDF...";
       btn.disabled = true;
 
-      // 1. Remove temporariamente as escalas de zoom mobile
-      const wrappers = document.querySelectorAll(".page-wrapper");
       const paginas = document.querySelectorAll(".a4-page");
-      
+      if (paginas.length === 0) {
+        alert("Nenhuma página para gerar.");
+        btn.innerText = "📥 Baixar PDF";
+        btn.disabled = false;
+        return;
+      }
+
+      // 1. Remove temporariamente as escalas de zoom mobile
       paginas.forEach(p => {
         p.style.transform = "none";
       });
 
-      wrappers.forEach(w => {
-        w.style.width = "210mm";
-        w.style.height = "297mm";
-        w.style.pageBreakAfter = "always";
-        w.style.breakAfter = "page";
-      });
-
       const titulo = document.getElementById("tituloProva").value.trim() || "prova";
-      
-      const opcoes = {
-        margin:       0,
-        filename:     `${titulo.toLowerCase().replace(/\s+/g, '_')}.pdf`,
-        image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 2, useCORS: true, logging: false, scrollX: 0, scrollY: 0 },
-        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
-        pagebreak:    { mode: ['css', 'legacy'], before: '.page-wrapper' }
-      };
+      const nomeArquivo = `${titulo.toLowerCase().replace(/\s+/g, '_')}.pdf`;
 
-      html2pdf().set(opcoes).from(elemento).save().then(function() {
+      try {
+        const { jsPDF } = window.jspdf || { jsPDF: window.jsPDF };
+        const pdf = new jsPDF('p', 'mm', 'a4');
+
+        for (let i = 0; i < paginas.length; i++) {
+          const pagina = paginas[i];
+
+          // Gera a imagem do elemento A4 exato
+          const canvas = await html2canvas(pagina, {
+            scale: 2,
+            useCORS: true,
+            logging: false,
+            scrollX: 0,
+            scrollY: 0,
+            windowWidth: 794
+          });
+
+          const imgData = canvas.toDataURL('image/jpeg', 0.98);
+
+          if (i > 0) {
+            pdf.addPage();
+          }
+
+          // Desenha a imagem ocupando exatamente o tamanho A4 (210mm x 297mm)
+          pdf.addImage(imgData, 'JPEG', 0, 0, 210, 297);
+        }
+
+        pdf.save(nomeArquivo);
+      } catch (err) {
+        // Fallback caso jsPDF direto não esteja escopado globalmente
+        console.error(err);
+        alert("Erro ao processar PDF. Tentando método secundário...");
+        
+        const elemento = document.getElementById("documento-paginado");
+        const opcoes = {
+          margin: 0,
+          filename: nomeArquivo,
+          image: { type: 'jpeg', quality: 0.98 },
+          html2canvas: { scale: 2, useCORS: true, scrollX: 0, scrollY: 0 },
+          jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+          pagebreak: { mode: 'avoid-all' }
+        };
+        await html2pdf().set(opcoes).from(elemento).save();
+      } finally {
         btn.innerText = "📥 Baixar PDF";
         btn.disabled = false;
         ajustarEscolaMobile();
-      }).catch(err => {
-        alert("Ocorreu um erro ao gerar o PDF. Tente novamente.");
-        btn.innerText = "📥 Baixar PDF";
-        btn.disabled = false;
-        ajustarEscolaMobile();
-      });
+      }
     }
+  
   
     window.addEventListener('scroll', function() {
       const vis = document.getElementById("visualizacaoProva");
