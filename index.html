@@ -479,7 +479,6 @@
 
       return html;
     }
-
     function adicionarOuSalvarQuestao() {
       let titulo = document.getElementById("titulo").value.trim();
       let enunciado = document.getElementById("enunciado").value;
@@ -519,6 +518,7 @@
       salvarQuestaoNoBanco(dadosQuestao);
       renderizarListaEditor();
     }
+
     function editarQuestao(id) {
       let q = questoesArray.find(item => item.id === id);
       if (!q) return;
@@ -563,7 +563,8 @@
         </button>
       `;
     }
-function limparFormulario() {
+
+    function limparFormulario() {
       document.getElementById("titulo").value = "";
       document.getElementById("enunciado").value = "";
       document.getElementById("tipo").value = "dissertativa";
@@ -580,7 +581,6 @@ function limparFormulario() {
       document.getElementById("respostaVF").value = "";
       alternarCamposTipo();
     }
-
     function renderizarListaEditor() {
       let lista = document.getElementById("listaQuestoes");
       if (questoesArray.length === 0) {
@@ -607,7 +607,6 @@ function limparFormulario() {
         lista.appendChild(item);
       });
     }
-
     function excluirQuestao(id) {
       if (confirm("Deseja realmente excluir esta questão da prova?")) {
         if (questaoEmEdicaoId === id) cancelarEdicao();
@@ -685,6 +684,7 @@ function limparFormulario() {
         lista.appendChild(div);
       });
     }
+
     function carregarProva(id) {
       let provasSalvas = JSON.parse(localStorage.getItem("provasSalvas") || "[]");
       let prova = provasSalvas.find(p => p.id === id);
@@ -712,7 +712,6 @@ function limparFormulario() {
         renderizarProvasSalvas();
       }
     }
-
     function salvarQuestaoNoBanco(questao) {
       let banco = JSON.parse(localStorage.getItem("bancoQuestoes") || "[]");
       let index = banco.findIndex(q => q.id === questao.id);
@@ -780,6 +779,7 @@ function limparFormulario() {
       });
     }
 
+    /* ATUALIZADO: Importação ajustada para evitar sobreposição de IDs */
     function importarSelecionadas() {
       let marcadas = document.querySelectorAll(".checkQuestao:checked");
 
@@ -790,13 +790,13 @@ function limparFormulario() {
 
       let banco = JSON.parse(localStorage.getItem("bancoQuestoes") || "[]");
 
-      marcadas.forEach(check => {
+      marcadas.forEach((check, index) => {
         let id = Number(check.value);
         let q = banco.find(x => x.id === id);
 
         if (q) {
           let novaQuestao = JSON.parse(JSON.stringify(q));
-          novaQuestao.id = Date.now() + Math.floor(Math.random() * 100000);
+          novaQuestao.id = Date.now() + index + Math.floor(Math.random() * 1000);
           questoesArray.push(novaQuestao);
         }
       });
@@ -830,7 +830,6 @@ function limparFormulario() {
       renderizarBancoQuestoes();
       alert("Questões excluídas com sucesso!");
     }
-
     function excluirQuestaoBanco(id) {
       if (confirm("Remover esta questão do banco de dados local?")) {
         let banco = JSON.parse(localStorage.getItem("bancoQuestoes") || "[]");
@@ -887,7 +886,7 @@ function limparFormulario() {
       }
     }
 
-    /* PAGINAÇÃO COM NUMERAÇÃO AUTOMÁTICA */
+    /* PAGINAÇÃO COM NUMERAÇÃO AUTOMÁTICA E CÁLCULO DE ALTURA PRECISO */
     function paginarDocumento() {
       const containerDoc = document.getElementById('documento-paginado');
       containerDoc.innerHTML = '';
@@ -919,8 +918,9 @@ function limparFormulario() {
         questaoElem.innerHTML = gerarHtmlQuestao(q, idx + 1);
 
         colunas.appendChild(questaoElem);
-        const alturaQuestao = questaoElem.offsetHeight || 120;
-
+        
+        // Medição corrigida utilizando getBoundingClientRect para precisão de renderização
+        const alturaQuestao = questaoElem.getBoundingClientRect().height || questaoElem.offsetHeight || 120;
         const limiteAtual = (paginaIndex === 1) ? LIMITE_ALTURA_PAG1 : LIMITE_ALTURA_OUTRAS;
 
         if (alturaAcumulada + alturaQuestao > limiteAtual && colunas.children.length > 1) {
@@ -937,7 +937,7 @@ function limparFormulario() {
           colunas = novaPagina.querySelector('.columns-container');
           colunas.appendChild(questaoElem);
 
-          alturaAcumulada = questaoElem.offsetHeight || 120;
+          alturaAcumulada = questaoElem.getBoundingClientRect().height || questaoElem.offsetHeight || 120;
         } else {
           alturaAcumulada += alturaQuestao;
         }
@@ -1005,6 +1005,7 @@ function limparFormulario() {
       `;
       return page;
     }
+
     function atualizarNavegacao() {
       const paginas = document.querySelectorAll('.a4-page');
       const indicator = document.getElementById('page-indicator');
@@ -1059,7 +1060,6 @@ function limparFormulario() {
         }
       });
     }
-
     function abrirVisualizacao() {
       document.getElementById("editor").style.display = "none";
       document.getElementById("bancoQuestoes").style.display = "none";
@@ -1073,14 +1073,16 @@ function limparFormulario() {
       paginarDocumento();
       window.scrollTo(0, 0);
     }
-
     function fecharVisualizacao() {
       document.getElementById("visualizacaoProva").style.display = "none";
       document.getElementById("editor").style.display = "block";
     }
 
-    /* GERAÇÃO DIRETA DE PDF */
+    /* GERAÇÃO DIRETA DE PDF RECALCULADA */
     function gerarPDFDireto() {
+      // Repagina para recalcular com base no estado atual da árvore do DOM
+      paginarDocumento();
+
       const elemento = document.getElementById("documento-paginado");
       const btn = document.getElementById("btnDownloadPDF");
       
@@ -1138,6 +1140,4 @@ function limparFormulario() {
   </script>
 </body>
 </html>
-
-
       
