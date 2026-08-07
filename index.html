@@ -1205,44 +1205,73 @@ async function gerarPDFDireto() {
         scale: 2,
         useCORS: true,
         logging: false,
+async function gerarPDFDireto() {
+  const btn = document.getElementById("btnDownloadPDF");
+  btn.innerText = "⏳ Gerando PDF...";
+  btn.disabled = true;
+
+  try {
+    // 1. Identifica a biblioteca jsPDF instalada no escopo global
+    let jsPDF;
+    if (window.jspdf && window.jspdf.jsPDF) {
+      jsPDF = window.jspdf.jsPDF;
+    } else if (window.jsPDF) {
+      jsPDF = window.jsPDF;
+    } else {
+      throw new Error("Biblioteca jsPDF não carregada na página.");
+    }
+
+    // 2. Busca todas as páginas renderizadas
+    const paginas = document.querySelectorAll(".a4-page");
+    if (!paginas || paginas.length === 0) {
+      alert("Nenhuma página encontrada para exportação.");
+      return;
+    }
+
+    const titulo = document.getElementById("tituloProva")?.value.trim() || "prova";
+    const nomeArquivo = `${titulo.toLowerCase().replace(/\s+/g, '_')}.pdf`;
+
+    const pdf = new jsPDF('p', 'mm', 'a4');
+
+    for (let i = 0; i < paginas.length; i++) {
+      const pagina = paginas[i];
+
+      // Garante visualização direta durante o print da tela
+      pagina.style.visibility = "visible";
+      pagina.style.opacity = "1";
+
+      // Captura da folha usando html2canvas com configurações leves para mobile
+      const canvas = await html2canvas(pagina, {
+        scale: 1.5, // Reduz levemente o consumo de RAM do celular sem perder qualidade visual
+        useCORS: true,
+        logging: false,
         backgroundColor: "#ffffff",
         scrollX: 0,
-        scrollY: 0,
-        windowWidth: 794
+        scrollY: 0
       });
 
-      // Restaura os estilos visuais
-      pagina.style.transform = transformOrig;
-      pagina.style.display = displayOrig;
-      pagina.style.position = positionOrig;
-      if (wrapper) {
-        wrapper.style.display = "";
-        wrapper.style.width = wrapperWidthOrig;
-        wrapper.style.height = wrapperHeightOrig;
-      }
-
-      const imgData = canvas.toDataURL('image/jpeg', 0.98);
+      const imgData = canvas.toDataURL('image/jpeg', 0.95);
 
       if (i > 0) {
         pdf.addPage('a4', 'p');
       }
 
-      // Adiciona a imagem capturada à página do PDF
       pdf.addImage(imgData, 'JPEG', 0, 0, 210, 297);
     }
 
-    // Baixa o PDF gerado
+    // 3. Salva o arquivo final
     pdf.save(nomeArquivo);
 
   } catch (erro) {
-    console.error("Erro ao gerar PDF:", erro);
-    alert("Ocorreu um erro ao gerar o PDF. Verifique os dados e tente novamente.");
+    console.error("Erro detalhado ao gerar o PDF:", erro);
+    alert("Falha na geração do PDF: " + (erro.message || "Verifique o console do navegador."));
   } finally {
     btn.innerText = "📥 Baixar PDF";
     btn.disabled = false;
     ajustarEscolaMobile();
   }
-    }
+      }
+        
       
     
         
