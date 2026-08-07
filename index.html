@@ -1199,79 +1199,89 @@ async function gerarPDFDireto() {
 
       // Aguarda a renderização no navegador
       await new Promise(resolve => setTimeout(resolve, 150));
-
-      // Captura o canvas da página
-      const canvas = await html2canvas(pagina, {
-        scale: 2,
-        useCORS: true,
-        logging: false,
 async function gerarPDFDireto() {
   const btn = document.getElementById("btnDownloadPDF");
   btn.innerText = "⏳ Gerando PDF...";
   btn.disabled = true;
 
-  try {
-    // 1. Identifica a biblioteca jsPDF instalada no escopo global
-    let jsPDF;
-    if (window.jspdf && window.jspdf.jsPDF) {
-      jsPDF = window.jspdf.jsPDF;
-    } else if (window.jsPDF) {
-      jsPDF = window.jsPDF;
-    } else {
-      throw new Error("Biblioteca jsPDF não carregada na página.");
-    }
+  // Garante topo da página
+  window.scrollTo(0, 0);
 
-    // 2. Busca todas as páginas renderizadas
-    const paginas = document.querySelectorAll(".a4-page");
-    if (!paginas || paginas.length === 0) {
-      alert("Nenhuma página encontrada para exportação.");
-      return;
-    }
-
-    const titulo = document.getElementById("tituloProva")?.value.trim() || "prova";
-    const nomeArquivo = `${titulo.toLowerCase().replace(/\s+/g, '_')}.pdf`;
-
-    const pdf = new jsPDF('p', 'mm', 'a4');
-
-    for (let i = 0; i < paginas.length; i++) {
-      const pagina = paginas[i];
-
-      // Garante visualização direta durante o print da tela
-      pagina.style.visibility = "visible";
-      pagina.style.opacity = "1";
-
-      // Captura da folha usando html2canvas com configurações leves para mobile
-      const canvas = await html2canvas(pagina, {
-        scale: 1.5, // Reduz levemente o consumo de RAM do celular sem perder qualidade visual
-        useCORS: true,
-        logging: false,
-        backgroundColor: "#ffffff",
-        scrollX: 0,
-        scrollY: 0
-      });
-
-      const imgData = canvas.toDataURL('image/jpeg', 0.95);
-
-      if (i > 0) {
-        pdf.addPage('a4', 'p');
-      }
-
-      pdf.addImage(imgData, 'JPEG', 0, 0, 210, 297);
-    }
-
-    // 3. Salva o arquivo final
-    pdf.save(nomeArquivo);
-
-  } catch (erro) {
-    console.error("Erro detalhado ao gerar o PDF:", erro);
-    alert("Falha na geração do PDF: " + (erro.message || "Verifique o console do navegador."));
-  } finally {
+  const paginas = document.querySelectorAll(".a4-page");
+  if (!paginas || paginas.length === 0) {
+    alert("Nenhuma página encontrada para exportar.");
     btn.innerText = "📥 Baixar PDF";
     btn.disabled = false;
-    ajustarEscolaMobile();
+    return;
+  }
+
+  const titulo = document.getElementById("tituloProva")?.value.trim() || "prova";
+  const nomeArquivo = `${titulo.toLowerCase().replace(/\s+/g, '_')}.pdf`;
+
+  // Criamos um container temporário visível no fluxo leve para a captura
+  const tempArea = document.createElement("div");
+  tempArea.style.position = "absolute";
+  tempArea.style.top = "0";
+  tempArea.style.left = "0";
+  tempArea.style.zIndex = "-9999";
+  tempArea.style.width = "210mm";
+  tempArea.style.background = "#ffffff";
+
+  paginas.forEach((pag, idx) => {
+    const clone = pag.cloneNode(true);
+    clone.style.transform = "none";
+    clone.style.display = "block";
+    clone.style.margin = "0";
+    clone.style.boxShadow = "none";
+    clone.style.width = "210mm";
+    clone.style.height = "297mm";
+    clone.style.boxSizing = "border-box";
+    
+    // Força a quebra de página exata do PDF
+    if (idx < paginas.length - 1) {
+      clone.style.pageBreakAfter = "always";
+      clone.style.breakAfter = "page";
+    }
+
+    tempArea.appendChild(clone);
+  });
+
+  document.body.appendChild(tempArea);
+
+  // Configuração otimizada para navegadores móveis (Android Chrome)
+  const opt = {
+    margin: 0,
+    filename: nomeArquivo,
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: {
+      scale: 1.5,
+      useCORS: true,
+      logging: false,
+      scrollX: 0,
+      scrollY: 0
+    },
+    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+  };
+
+  try {
+    // Dispara a geração usando a biblioteca unificada html2pdf
+    await html2pdf().set(opt).from(tempArea).save();
+  } catch (erro) {
+    console.error("Erro ao gerar o PDF:", erro);
+    alert("Não foi possível gerar o PDF. Verifique se o navegador bloqueou o download.");
+  } finally {
+    // Limpeza da área temporária e restauração dos botões
+    if (document.body.contains(tempArea)) {
+      document.body.removeChild(tempArea);
+    }
+    btn.innerText = "📥 Baixar PDF";
+    btn.disabled = false;
+    if (typeof ajustarEscolaMobile === "function") {
+      ajustarEscolaMobile();
+    }
   }
       }
-        
+      
       
     
         
