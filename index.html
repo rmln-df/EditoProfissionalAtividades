@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Prova IA - Editor Profissional</title>
 
-  <!-- BIBLIOTECA PARA GERAR PDF DIRETO NO CELULAR -->
+  <!-- BIBLIOTECA PARA GERAR PDF DIRETO NO CELULAR E DESKTOPS -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
   <style>
@@ -25,42 +25,41 @@
     .btn-delete { background-color: #c53030; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 8pt; }
   
     .page-scaler {
-  width: 100%;
-  margin-top: 70px;
-  padding: 10px 0 30px 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  overflow-x: auto;
-}  
+      width: 100%;
+      margin-top: 70px;
+      padding: 10px 0 30px 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      overflow-x: auto;
+    }  
 
-.page-wrapper {
-  width: 210mm;
-  height: 297mm;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  margin: 15px auto;
-  position: relative;
-  flex-shrink: 0;
-} 
+    .page-wrapper {
+      width: 210mm;
+      height: 297mm;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      margin: 15px auto;
+      position: relative;
+      flex-shrink: 0;
+    } 
 
-.a4-page {
-  width: 210mm;
-  height: 297mm;
-  min-width: 210mm;
-  min-height: 297mm;
-  padding: 12mm;
-  background: #fff;
-  display: flex;
-  flex-direction: column;
-  position: relative;
-  box-sizing: border-box;
-  transform-origin: top center;
-  box-shadow: 0 0 10px rgba(0,0,0,0.3);
-}
+    .a4-page {
+      width: 210mm;
+      height: 297mm;
+      min-width: 210mm;
+      min-height: 297mm;
+      padding: 12mm;
+      background: #fff;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      box-sizing: border-box;
+      transform-origin: top center;
+      box-shadow: 0 0 10px rgba(0,0,0,0.3);
+    }
 
-    
     .header-bar { background-color: #1b365d; color: #ffffff; text-align: center; padding: 8px 10px; border-radius: 2px; margin-bottom: 10px; flex-shrink: 0; }
     .header-bar h1 { margin: 0; font-size: 11pt; text-transform: uppercase; }
     .header-bar p { margin: 2px 0 0 0; font-size: 8pt; }
@@ -69,25 +68,25 @@
     .continuation-bar { font-size: 8pt; color: #555; display: flex; justify-content: space-between; border-bottom: 1px solid #ccc; padding-bottom: 4px; margin-bottom: 10px; flex-shrink: 0; }
     
     .columns-container { 
-  column-count: 2; 
-  column-gap: 24px; 
-  column-rule: 1px solid #000000; 
-  width: 100%; 
-  overflow: hidden; 
-  box-sizing: border-box;
-  flex-grow: 1;
-}
+      column-count: 2; 
+      column-gap: 24px; 
+      column-rule: 1px solid #000000; 
+      width: 100%; 
+      overflow: hidden; 
+      box-sizing: border-box;
+      flex-grow: 1;
+    }
 
-.questao { 
-  margin-bottom: 12px; 
-  font-size: 9.5pt; 
-  line-height: 1.35; 
-  text-align: justify; 
-  break-inside: avoid; 
-  page-break-inside: avoid;
-  display: inline-block; /* Garante cálculo preciso de altura no fluxo de colunas */
-  width: 100%;
-}
+    .questao { 
+      margin-bottom: 12px; 
+      font-size: 9.5pt; 
+      line-height: 1.35; 
+      text-align: justify; 
+      break-inside: avoid; 
+      page-break-inside: avoid;
+      display: inline-block;
+      width: 100%;
+    }
 
     .questao p { margin: 3px 0; }
     .questao-titulo { font-weight: bold; color: #1b365d; margin-bottom: 4px; border-left: 3px solid #2b6cb0; padding-left: 5px; break-after: avoid; }
@@ -460,6 +459,24 @@
       document.getElementById("secaoLinhas").style.display = tipo === "dissertativa" ? "block" : "none";
     }
 
+    function limparFormulario() {
+      document.getElementById("titulo").value = "";
+      document.getElementById("enunciado").value = "";
+      document.getElementById("tipo").value = "dissertativa";
+      document.getElementById("gabarito").value = "";
+      document.getElementById("espaco").value = "0";
+      document.getElementById("calculo").checked = false;
+      document.getElementById("altA").value = "";
+      document.getElementById("altB").value = "";
+      document.getElementById("altC").value = "";
+      document.getElementById("altD").value = "";
+      document.getElementById("altE").value = "";
+      document.getElementById("corretaMultipla").value = "";
+      document.getElementById("respostaCE").value = "";
+      document.getElementById("respostaVF").value = "";
+      alternarCamposTipo();
+    }
+
     function gerarHtmlQuestao(q, numeroAuto = null) {
       let prefixoTitulo = numeroAuto !== null ? `QUESTÃO ${numeroAuto}` : (q.titulo || "QUESTÃO");
       let html = `<div class='questao-titulo'>${prefixoTitulo}</div><p>${q.enunciado}</p>`;
@@ -576,80 +593,55 @@
       `;
     }
 
-    function limparFormulario() {
-      document.getElementById("titulo").value = "";
-      document.getElementById("enunciado").value = "";
-      document.getElementById("tipo").value = "dissertativa";
-      document.getElementById("gabarito").value = "";
-      document.getElementById("espaco").value = "0";
-      document.getElementById("calculo").checked = false;
-      document.getElementById("altA").value = "";
-      document.getElementById("altB").value = "";
-      document.getElementById("altC").value = "";
-      document.getElementById("altD").value = "";
-      document.getElementById("altE").value = "";
-      document.getElementById("corretaMultipla").value = "";
-      document.getElementById("respostaCE").value = "";
-      document.getElementById("respostaVF").value = "";
-      alternarCamposTipo();
-    }
-
-    function renderizarListaEditor() {
-      let lista = document.getElementById("listaQuestoes");
-      if (questoesArray.length === 0) {
-        lista.innerHTML = '<p style="color:#777;text-align:center;">Nenhuma questão adicionada.</p>';
-        return;
-      }
-      lista.innerHTML = "";
-      questoesArray.forEach((q, idx) => {
-        let item = document.createElement("div");
-        item.style.borderBottom = "1px solid #ddd";
-        item.style.padding = "10px 0";
-        item.innerHTML = `
-          <div style="display:flex;justify-content:space-between;align-items:center;">
-            <div>
-              <strong>Questão ${idx + 1}</strong> <small style="color:#666;">(${q.tipo})</small><br>
-              <small style="color:#555;">${q.enunciado ? q.enunciado.substring(0, 40) : ''}...</small>
-            </div>
-            <div>
-              <button class="btn-edit" onclick="editarQuestao(${q.id})">✏️ Editar</button>
-              <button class="btn-delete" onclick="excluirQuestao(${q.id})">🗑 Excluir</button>
-            </div>
-          </div>
-        `;
-        lista.appendChild(item);
-      });
-    }
     function excluirQuestao(id) {
-      if (confirm("Deseja realmente excluir esta questão da prova?")) {
-        if (questaoEmEdicaoId === id) cancelarEdicao();
-        questoesArray = questoesArray.filter(q => q.id !== id);
-        renderizarListaEditor();
-      }
+      questoesArray = questoesArray.filter(q => q.id !== id);
+      renderizarListaEditor();
     }
 
     function limparTodasQuestoesProva() {
-      if (questoesArray.length === 0) {
-        alert("A prova já está vazia.");
-        return;
-      }
-
-      if (confirm("Deseja remover TODAS as questões da prova atual? (As questões do Banco de Questões continuarão salvas)")) {
+      if (confirm("Tem certeza que deseja apagar todas as questões desta prova?")) {
         questoesArray = [];
         renderizarListaEditor();
-        alert("Todas as questões foram removidas da prova atual.");
       }
     }
 
-    /* ARMAZENAMENTO LOCAL */
-    function salvarProvaAtual() {
-      if (!provaAtualId) {
-        provaAtualId = Date.now();
+    function renderizarListaEditor() {
+      let div = document.getElementById("listaQuestoes");
+      if (questoesArray.length === 0) {
+        div.innerHTML = `<p style="color:#777;text-align:center;">Nenhuma questão adicionada.</p>`;
+        return;
       }
+      let html = "";
+      questoesArray.forEach((q, idx) => {
+        let t = q.titulo || `QUESTÃO ${idx + 1}`;
+        html += `
+          <div class="item-salvo">
+            <div><strong>${t}</strong> - ${q.enunciado.substring(0, 40)}...</div>
+            <div>
+              <button class="btn-edit" onclick="editarQuestao(${q.id})">✏️ Editar</button>
+              <button class="btn-delete" onclick="excluirQuestao(${q.id})">🗑️ Excluir</button>
+            </div>
+          </div>
+        `;
+      });
+      div.innerHTML = html;
+    }
 
+    function salvarQuestaoNoBanco(q) {
+      let banco = JSON.parse(localStorage.getItem("bancoQuestoes") || "[]");
+      let idx = banco.findIndex(item => item.id === q.id);
+      if (idx !== -1) {
+        banco[idx] = q;
+      } else {
+        banco.push(q);
+      }
+      localStorage.setItem("bancoQuestoes", JSON.stringify(banco));
+    }
+
+    function salvarProvaAtual() {
       let titulo = document.getElementById("tituloProva").value.trim() || "Prova sem título";
       let provaData = {
-        id: provaAtualId,
+        id: provaAtualId || Date.now(),
         titulo: titulo,
         disciplina: document.getElementById("disciplina").value,
         professor: document.getElementById("professor").value,
@@ -672,193 +664,122 @@
     }
 
     function renderizarProvasSalvas() {
-      let lista = document.getElementById("listaProvasSalvas");
-      let provasSalvas = JSON.parse(localStorage.getItem("provasSalvas") || "[]");
-
-      if (provasSalvas.length === 0) {
-        lista.innerHTML = "<p style='text-align:center; color:#666;'>Nenhuma prova salva neste dispositivo.</p>";
+      let div = document.getElementById("listaProvasSalvas");
+      let provas = JSON.parse(localStorage.getItem("provasSalvas") || "[]");
+      if (provas.length === 0) {
+        div.innerHTML = "<p style='text-align:center;color:#666;'>Nenhuma prova salva.</p>";
         return;
       }
-
-      lista.innerHTML = "";
-      provasSalvas.forEach(prova => {
-        let div = document.createElement("div");
-        div.className = "item-salvo";
-        div.innerHTML = `
-          <div>
-            <strong>${prova.titulo}</strong> (${prova.disciplina || 'Geral'})<br>
-            <small style="color:#666;">${prova.questoes.length} questão(ões)</small>
-          </div>
-          <div>
-            <button class="btn" style="background:#2b6cb0; color:white;" onclick="carregarProva(${prova.id})">📂 Abrir</button>
-            <button class="btn-delete" onclick="excluirProvaSalva(${prova.id})">🗑 Excluir</button>
+      let html = "";
+      provas.forEach(p => {
+        html += `
+          <div class="item-salvo">
+            <div><strong>${p.titulo}</strong> (${p.questoes ? p.questoes.length : 0} questões)</div>
+            <div>
+              <button class="btn-edit" onclick="carregarProva(${p.id})">📂 Abrir</button>
+              <button class="btn-delete" onclick="excluirProva(${p.id})">🗑️ Excluir</button>
+            </div>
           </div>
         `;
-        lista.appendChild(div);
       });
+      div.innerHTML = html;
     }
 
     function carregarProva(id) {
-      let provasSalvas = JSON.parse(localStorage.getItem("provasSalvas") || "[]");
-      let prova = provasSalvas.find(p => p.id === id);
-      if (!prova) return;
+      let provas = JSON.parse(localStorage.getItem("provasSalvas") || "[]");
+      let p = provas.find(item => item.id === id);
+      if (!p) return;
 
-      provaAtualId = prova.id;
-      document.getElementById("tituloProva").value = prova.titulo || "";
-      document.getElementById("disciplina").value = prova.disciplina || "";
-      document.getElementById("professor").value = prova.professor || "";
-      document.getElementById("turma").value = prova.turma || "";
-      document.getElementById("data").value = prova.data || "";
-      questoesArray = prova.questoes || [];
+      provaAtualId = p.id;
+      document.getElementById("tituloProva").value = p.titulo || "";
+      document.getElementById("disciplina").value = p.disciplina || "";
+      document.getElementById("professor").value = p.professor || "";
+      document.getElementById("turma").value = p.turma || "";
+      document.getElementById("data").value = p.data || "";
+      questoesArray = p.questoes || [];
 
       renderizarListaEditor();
-
       document.getElementById("provasSalvas").style.display = "none";
       document.getElementById("editor").style.display = "block";
     }
 
-    function excluirProvaSalva(id) {
-      if (confirm("Deseja realmente apagar esta prova do dispositivo?")) {
-        let provasSalvas = JSON.parse(localStorage.getItem("provasSalvas") || "[]");
-        provasSalvas = provasSalvas.filter(p => p.id !== id);
-        localStorage.setItem("provasSalvas", JSON.stringify(provasSalvas));
+    function excluirProva(id) {
+      if (confirm("Deseja excluir esta prova?")) {
+        let provas = JSON.parse(localStorage.getItem("provasSalvas") || "[]");
+        provas = provas.filter(p => p.id !== id);
+        localStorage.setItem("provasSalvas", JSON.stringify(provas));
         renderizarProvasSalvas();
       }
     }
 
-    function salvarQuestaoNoBanco(questao) {
-      let banco = JSON.parse(localStorage.getItem("bancoQuestoes") || "[]");
-      let index = banco.findIndex(q => q.id === questao.id);
-      if (index !== -1) {
-        banco[index] = questao;
-      } else {
-        banco.push(questao);
-      }
-      localStorage.setItem("bancoQuestoes", JSON.stringify(banco));
-    }
-
     function renderizarBancoQuestoes() {
-      let lista = document.getElementById("listaBancoQuestoes");
+      let div = document.getElementById("listaBancoQuestoes");
       let banco = JSON.parse(localStorage.getItem("bancoQuestoes") || "[]");
-
       if (banco.length === 0) {
-        lista.innerHTML = "<p style='text-align:center; color:#666;'>Nenhuma questão salva no banco.</p>";
+        div.innerHTML = "<p style='text-align:center;color:#666;'>Nenhuma questão salva no banco.</p>";
         return;
       }
-
-      lista.innerHTML = "";
-      banco.forEach(q => {
-        let div = document.createElement("div");
-        div.className = "item-salvo";
-        div.innerHTML = `
-          <div style="display:flex; align-items:center; gap:12px; flex:1;">
-            <input type="checkbox" class="checkQuestao" value="${q.id}" style="transform:scale(1.3); margin-right:5px; cursor:pointer;">
-            <div>
-              <strong>${q.titulo || 'Questão'}</strong> - <small>${q.tipo}</small><br>
-              <small style="color:#666;">
-                ${q.enunciado ? q.enunciado.substring(0,50) : ""}...
-              </small>
+      let html = "";
+      banco.forEach((q, i) => {
+        let t = q.titulo || `Questão ${i + 1}`;
+        html += `
+          <div class="item-salvo" id="banco-item-${q.id}">
+            <div style="display:flex; align-items:center; gap:10px;">
+              <input type="checkbox" class="chk-banco" value="${q.id}">
+              <div><strong>${t}</strong> - ${q.enunciado.substring(0, 35)}...</div>
             </div>
           </div>
-          <div>
-            <button class="btn-delete" onclick="excluirQuestaoBanco(${q.id})">🗑 Excluir</button>
-          </div>
         `;
-        lista.appendChild(div);
-
-        let check = div.querySelector(".checkQuestao");
-        check.addEventListener("change", function() {
-          if (this.checked) {
-            div.classList.add("selecionado");
-          } else {
-            div.classList.remove("selecionado");
-          }
-        });
       });
+      div.innerHTML = html;
     }
+
     function selecionarTodasQuestoes() {
-      document.querySelectorAll(".checkQuestao").forEach(check => {
-        check.checked = true;
-        check.closest('.item-salvo').classList.add("selecionado");
-      });
+      document.querySelectorAll('.chk-banco').forEach(c => c.checked = true);
     }
 
     function desmarcarTodasQuestoes() {
-      document.querySelectorAll(".checkQuestao").forEach(check => {
-        check.checked = false;
-        check.closest('.item-salvo').classList.remove("selecionado");
-      });
+      document.querySelectorAll('.chk-banco').forEach(c => c.checked = false);
     }
 
     function importarSelecionadas() {
-      let marcadas = document.querySelectorAll(".checkQuestao:checked");
-
-      if (marcadas.length === 0) {
-        alert("Selecione pelo menos uma questão.");
+      let banco = JSON.parse(localStorage.getItem("bancoQuestoes") || "[]");
+      let chks = document.querySelectorAll('.chk-banco:checked');
+      if (chks.length === 0) {
+        alert("Selecione ao menos uma questão para importar.");
         return;
       }
-
-      let banco = JSON.parse(localStorage.getItem("bancoQuestoes") || "[]");
-
-      marcadas.forEach(check => {
-        let id = Number(check.value);
-        let q = banco.find(x => x.id === id);
-
+      chks.forEach(c => {
+        let id = parseInt(c.value);
+        let q = banco.find(item => item.id === id);
         if (q) {
-          let novaQuestao = JSON.parse(JSON.stringify(q));
-          novaQuestao.id = Date.now() + Math.floor(Math.random() * 100000);
-          questoesArray.push(novaQuestao);
+          questoesArray.push({...q, id: Date.now() + Math.floor(Math.random() * 1000)});
         }
       });
-
+      alert("Questões importadas com sucesso!");
       renderizarListaEditor();
-
-      document.getElementById("bancoQuestoes").style.display = "none";
-      document.getElementById("editor").style.display = "block";
-
-      alert(marcadas.length + " questão(ões) importada(s) com sucesso!");
+      voltarMenu();
     }
 
     function excluirSelecionadas() {
-      let selecionadas = document.querySelectorAll(".checkQuestao:checked");
-
-      if (selecionadas.length === 0) {
-        alert("Selecione pelo menos uma questão.");
-        return;
-      }
-
-      if (!confirm("Deseja excluir " + selecionadas.length + " questão(ões)?")) {
-        return;
-      }
-
-      let banco = JSON.parse(localStorage.getItem("bancoQuestoes") || "[]");
-      let ids = Array.from(selecionadas).map(check => Number(check.value));
-
-      banco = banco.filter(q => !ids.includes(Number(q.id)));
-      localStorage.setItem("bancoQuestoes", JSON.stringify(banco));
-
-      renderizarBancoQuestoes();
-      alert("Questões excluídas com sucesso!");
-    }
-    function excluirQuestaoBanco(id) {
-      if (confirm("Remover esta questão do banco de dados local?")) {
+      let chks = document.querySelectorAll('.chk-banco:checked');
+      if (chks.length === 0) return;
+      if (confirm("Excluir as questões selecionadas do banco?")) {
         let banco = JSON.parse(localStorage.getItem("bancoQuestoes") || "[]");
-        banco = banco.filter(q => q.id !== id);
+        let idsParaExcluir = Array.from(chks).map(c => parseInt(c.value));
+        banco = banco.filter(q => !idsParaExcluir.includes(q.id));
         localStorage.setItem("bancoQuestoes", JSON.stringify(banco));
         renderizarBancoQuestoes();
       }
     }
 
     function excluirTodasQuestoesBanco() {
-      if (!confirm("Deseja realmente excluir TODAS as questões do Banco de Questões?")) return;
-      if (!confirm("Esta ação é definitiva e não poderá ser desfeita. Deseja continuar?")) return;
-
-      localStorage.removeItem("bancoQuestoes");
-      renderizarBancoQuestoes();
-      alert("✅ Todas as questões foram excluídas.");
+      if (confirm("Tem certeza que deseja apagar TODO o banco de questões?")) {
+        localStorage.removeItem("bancoQuestoes");
+        renderizarBancoQuestoes();
+      }
     }
 
-    /* BACKUP & CONFIGURAÇÕES */
     function exportarBackup() {
       let dados = {
         provas: JSON.parse(localStorage.getItem("provasSalvas") || "[]"),
@@ -871,421 +792,258 @@
       a.click();
     }
 
-    function importarBackup(e) {
-      let file = e.target.files[0];
+    function importarBackup(event) {
+      let file = event.target.files[0];
       if (!file) return;
-
       let reader = new FileReader();
-      reader.onload = function(evt) {
+      reader.onload = function(e) {
         try {
-          let dados = JSON.parse(evt.target.result);
+          let dados = JSON.parse(e.target.result);
           if (dados.provas) localStorage.setItem("provasSalvas", JSON.stringify(dados.provas));
           if (dados.banco) localStorage.setItem("bancoQuestoes", JSON.stringify(dados.banco));
           alert("Backup importado com sucesso!");
         } catch (err) {
-          alert("Erro ao ler o arquivo de backup.");
+          alert("Arquivo JSON inválido.");
         }
       };
       reader.readAsText(file);
     }
 
     function limparTudo() {
-      if (confirm("Tem certeza que deseja apagar todas as provas e questões salvas no aparelho?")) {
+      if (confirm("Deseja apagar TODOS os dados do aplicativo permanentemente?")) {
         localStorage.clear();
-        alert("Todos os dados locais foram removidos.");
+        alert("Todos os dados foram limpos.");
+        voltarMenu();
       }
     }
-
-    /* PAGINAÇÃO COM NUMERAÇÃO AUTOMÁTICA E MARGEM DE CORTE CORRIGIDA */
-    function paginarDocumento() {
-  const containerDoc = document.getElementById('documento-paginado');
-  containerDoc.innerHTML = '';
-
-  if (questoesArray.length === 0) {
-    containerDoc.innerHTML = '<div class="page-wrapper"><div class="a4-page"><p style="text-align:center; padding: 20px; color:#666;">Adicione questões para visualizar as folhas.</p></div></div>';
-    atualizarNavegacao();
-    ajustarEscolaMobile();
-    return;
-  }
-
-  // Capacidade vertical total somando as duas colunas (em pixels)
-  // Página 1 descontando o cabeçalho amplo; Páginas seguintes com área livre maior.
-  const CAPACIDADE_TOTAL_PAG1 = 1600; 
-  const CAPACIDADE_TOTAL_OUTRAS = 1850;
-
-  let paginaIndex = 1;
-  let novaPagina = criarEstruturaPagina(paginaIndex);
-  
-  let wrapper = document.createElement('div');
-  wrapper.className = 'page-wrapper';
-  wrapper.appendChild(novaPagina);
-  containerDoc.appendChild(wrapper);
-
-  let colunas = novaPagina.querySelector('.columns-container');
-  let capacidadeUsada = 0;
-
-  questoesArray.forEach((q, idx) => {
-    const questaoElem = document.createElement("div");
-    questaoElem.className = "questao";
-    questaoElem.innerHTML = gerarHtmlQuestao(q, idx + 1);
-
-    colunas.appendChild(questaoElem);
-    
-    // Obtém a altura real da questão montada
-    const alturaQuestao = questaoElem.getBoundingClientRect().height || questaoElem.offsetHeight || 100;
-    const limiteAtual = (paginaIndex === 1) ? CAPACIDADE_TOTAL_PAG1 : CAPACIDADE_TOTAL_OUTRAS;
-
-    // Se estourar a capacidade das duas colunas na página atual, move para a próxima folha
-    if (capacidadeUsada + alturaQuestao > limiteAtual && colunas.children.length > 1) {
-      colunas.removeChild(questaoElem);
-
-      paginaIndex++;
-      novaPagina = criarEstruturaPagina(paginaIndex);
-      
-      wrapper = document.createElement('div');
-      wrapper.className = 'page-wrapper';
-      wrapper.appendChild(novaPagina);
-      containerDoc.appendChild(wrapper);
-
-      colunas = novaPagina.querySelector('.columns-container');
-      colunas.appendChild(questaoElem);
-
-      // Reinicia contagem na nova folha com a altura do item movido
-      capacidadeUsada = questaoElem.getBoundingClientRect().height || questaoElem.offsetHeight || 100;
-    } else {
-      capacidadeUsada += alturaQuestao;
-    }
-  });
-
-  atualizarNavegacao();
-  ajustarEscolaMobile();
-}
-
-
     function criarEstruturaPagina(numPagina) {
-      const page = document.createElement('div');
-      page.className = 'a4-page';
-      page.id = `pagina-a4-${numPagina}`;
-      
-      let headerHtml = '';
-      let alturaColuna = '';
+      const page = document.createElement("div");
+      page.className = "a4-page";
 
-      let tituloVal = document.getElementById("tituloProva").value.trim() || 'AVALIAÇÃO';
-      let disciplinaVal = document.getElementById("disciplina").value.trim() || 'Geral';
-      let professorVal = document.getElementById("professor").value.trim();
-      let turmaVal = document.getElementById("turma").value.trim();
-
-      let dataRaw = document.getElementById("data").value;
-      let dataVal = "____/____/________";
-      if (dataRaw) {
-        const partes = dataRaw.split("-");
-        if (partes.length === 3) {
-          dataVal = `${partes[2]}/${partes[1]}/${partes[0]}`;
-        }
+      const titulo = document.getElementById("tituloProva").value.trim() || "AVALIAÇÃO";
+      const disciplina = document.getElementById("disciplina").value.trim();
+      const professor = document.getElementById("professor").value.trim();
+      const turma = document.getElementById("turma").value.trim();
+      const dataVal = document.getElementById("data").value;
+      let dataFormatada = "";
+      if (dataVal) {
+        let parts = dataVal.split("-");
+        if (parts.length === 3) dataFormatada = `${parts[2]}/${parts[1]}/${parts[0]}`;
       }
 
       if (numPagina === 1) {
-        headerHtml = `
+        page.innerHTML = `
           <div class="header-bar">
-            <h1>${tituloVal}</h1>
-            <p>${disciplinaVal}</p>
+            <h1>${titulo}</h1>
+            ${disciplina ? `<p>${disciplina}</p>` : ''}
           </div>
           <div class="student-info">
             <table>
               <tr>
-                <td style="width: 50%;"><strong>Estudante:</strong> _____________________________________</td>
-                <td style="width: 50%;"><strong>Professor(a):</strong> ${professorVal}</td>
+                <td><strong>Estudante:</strong> ________________________________________</td>
+                <td><strong>Professor(a):</strong> ${professor}</td>
               </tr>
               <tr>
-                <td style="width: 33%;"><strong>Data:</strong> ${dataVal}</td>
-                <td style="width: 33%;"><strong>Turma:</strong> ${turmaVal}</td>
-                <td style="width: 34%;"><strong>Nota:</strong> _________</td>
+                <td><strong>Data:</strong> ${dataFormatada}</td>
+                <td><strong>Turma:</strong> ${turma} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <strong>Nota:</strong> _______</td>
               </tr>
             </table>
           </div>
+          <div class="columns-container"></div>
         `;
-        alturaColuna = 'calc(297mm - 55mm)';
       } else {
-        headerHtml = `
+        page.innerHTML = `
           <div class="continuation-bar">
-            <span><strong>${disciplinaVal}</strong> - Continuação</span>
+            <span>${titulo}</span>
             <span>Folha ${numPagina}</span>
           </div>
+          <div class="columns-container"></div>
         `;
-        alturaColuna = 'calc(297mm - 32mm)';
       }
-
-      page.innerHTML = `
-        ${headerHtml}
-        <div class="columns-container" style="height: ${alturaColuna};"></div>
-      `;
       return page;
     }
-    function atualizarNavegacao() {
-      const paginas = document.querySelectorAll('.a4-page');
-      const indicator = document.getElementById('page-indicator');
-      const btnPrev = document.getElementById('btn-prev');
-      const btnNext = document.getElementById('btn-next');
 
-      if (paginas.length === 0) {
-        if (indicator) indicator.textContent = "Folha 0 de 0";
-        if (btnPrev) btnPrev.disabled = true;
-        if (btnNext) btnNext.disabled = true;
+    function paginarDocumento() {
+      const containerDoc = document.getElementById("documento-paginado");
+      containerDoc.innerHTML = "";
+
+      if (questoesArray.length === 0) {
+        let wrapper = document.createElement('div');
+        wrapper.className = 'page-wrapper';
+        wrapper.appendChild(criarEstruturaPagina(1));
+        containerDoc.appendChild(wrapper);
+        atualizarNavegacao();
         return;
       }
 
-      if (indicator) indicator.textContent = `Folha ${paginaAtual + 1} de ${paginas.length}`;
-      if (btnPrev) btnPrev.disabled = (paginaAtual === 0);
-      if (btnNext) btnNext.disabled = (paginaAtual === paginas.length - 1);
-    }
+      const CAPACIDADE_TOTAL_PAG1 = 1600; 
+      const CAPACIDADE_TOTAL_OUTRAS = 1850;
 
-    function irParaPagina(index) {
-      const paginas = document.querySelectorAll('.a4-page');
-      if (index < 0 || index >= paginas.length) return;
-      paginaAtual = index;
+      let paginaIndex = 1;
+      let novaPagina = criarEstruturaPagina(paginaIndex);
+      
+      let wrapper = document.createElement('div');
+      wrapper.className = 'page-wrapper';
+      wrapper.appendChild(novaPagina);
+      containerDoc.appendChild(wrapper);
+
+      let colunas = novaPagina.querySelector('.columns-container');
+      let capacidadeUsada = 0;
+
+      questoesArray.forEach((q, idx) => {
+        const questaoElem = document.createElement("div");
+        questaoElem.className = "questao";
+        questaoElem.innerHTML = gerarHtmlQuestao(q, idx + 1);
+
+        colunas.appendChild(questaoElem);
+        
+        const alturaQuestao = questaoElem.getBoundingClientRect().height || questaoElem.offsetHeight || 100;
+        const limiteAtual = (paginaIndex === 1) ? CAPACIDADE_TOTAL_PAG1 : CAPACIDADE_TOTAL_OUTRAS;
+
+        if (capacidadeUsada + alturaQuestao > limiteAtual && colunas.children.length > 1) {
+          colunas.removeChild(questaoElem);
+
+          paginaIndex++;
+          novaPagina = criarEstruturaPagina(paginaIndex);
+          
+          wrapper = document.createElement('div');
+          wrapper.className = 'page-wrapper';
+          wrapper.appendChild(novaPagina);
+          containerDoc.appendChild(wrapper);
+
+          colunas = novaPagina.querySelector('.columns-container');
+          colunas.appendChild(questaoElem);
+
+          capacidadeUsada = questaoElem.getBoundingClientRect().height || questaoElem.offsetHeight || 100;
+        } else {
+          capacidadeUsada += alturaQuestao;
+        }
+      });
+
       atualizarNavegacao();
-      paginas[paginaAtual].scrollIntoView({ behavior: 'smooth', block: 'center' });
+      ajustarEscolaMobile();
     }
-
-    /* REDIMENSIONAMENTO MOBILE VIA TRANSFORM SCALE */
-    function ajustarEscolaMobile() {
-  const paginas = document.querySelectorAll(".a4-page");
-  if (paginas.length === 0) return;
-
-  const margemSeguranca = 20; 
-  const larguraDisponivel = window.innerWidth - margemSeguranca;
-  
-  // Converte 210mm (largura A4) para pixels aproximados na tela (96 DPI)
-  const larguraA4Px = 794;
-  const alturaA4Px = 1123;
-
-  paginas.forEach(pagina => {
-    const wrapper = pagina.parentElement;
-
-    if (larguraDisponivel < larguraA4Px) {
-      // Calcula a escala mantendo a proporção exata da folha
-      const escala = larguraDisponivel / larguraA4Px;
-      
-      pagina.style.transform = `scale(${escala})`;
-      
-      if (wrapper && wrapper.classList.contains("page-wrapper")) {
-        wrapper.style.width = `${larguraA4Px * escala}px`;
-        wrapper.style.height = `${alturaA4Px * escala}px`;
-      }
-    } else {
-      pagina.style.transform = "none";
-      if (wrapper && wrapper.classList.contains("page-wrapper")) {
-        wrapper.style.width = "210mm";
-        wrapper.style.height = "297mm";
-      }
-    }
-  });
-}
 
     function abrirVisualizacao() {
-  document.getElementById("editor").style.display = "none";
-  document.getElementById("bancoQuestoes").style.display = "none";
-  document.getElementById("provasSalvas").style.display = "none";
-  document.getElementById("configuracoes").style.display = "none";
-  document.getElementById("menuPrincipal").style.display = "none";
-
-  // Torna a área visível primeiro
-  document.getElementById("visualizacaoProva").style.display = "block";
-
-  paginaAtual = 0;
-  
-  // Pequeno atraso para o navegador processar o display:block antes da medição
-  setTimeout(() => {
-    paginarDocumento();
-    window.scrollTo(0, 0);
-  }, 50);
-}
+      paginarDocumento();
+      document.getElementById("editor").style.display = "none";
+      document.getElementById("visualizacaoProva").style.display = "block";
+      irParaPagina(0);
+    }
 
     function fecharVisualizacao() {
       document.getElementById("visualizacaoProva").style.display = "none";
       document.getElementById("editor").style.display = "block";
     }
 
-    /* GERAÇÃO NATIVA E ISOLADA DE PDF (SEM CORTES OU PÁGINAS EXTRA) */
+    function irParaPagina(index) {
+      const paginas = document.querySelectorAll(".page-wrapper");
+      if (index < 0 || index >= paginas.length) return;
+      paginaAtual = index;
+      paginas[paginaAtual].scrollIntoView({ behavior: 'smooth' });
+      atualizarNavegacao();
+    }
+
+    function atualizarNavegacao() {
+      const paginas = document.querySelectorAll(".page-wrapper");
+      const total = paginas.length || 1;
+      document.getElementById("page-indicator").innerText = `Folha ${paginaAtual + 1} de ${total}`;
+      document.getElementById("btn-prev").disabled = (paginaAtual === 0);
+      document.getElementById("btn-next").disabled = (paginaAtual >= total - 1);
+    }
+
+    function ajustarEscolaMobile() {
+      const largTela = window.innerWidth;
+      const wrappers = document.querySelectorAll(".page-wrapper");
+      wrappers.forEach(w => {
+        if (largTela < 800) {
+          let scale = (largTela - 20) / 794;
+          w.style.transform = `scale(${scale})`;
+          w.style.transformOrigin = "top center";
+          w.style.height = `${1123 * scale}px`;
+        } else {
+          w.style.transform = "none";
+          w.style.height = "297mm";
+        }
+      });
+    }
+
     async function gerarPDFDireto() {
-  const btn = document.getElementById("btnDownloadPDF");
-  btn.innerText = "⏳ Gerando PDF...";
-  btn.disabled = true;
+      const btn = document.getElementById("btnDownloadPDF");
+      btn.innerText = "⏳ Gerando PDF...";
+      btn.disabled = true;
 
-  // Garante o scroll no topo para o html2canvas não capturar tela preta/branca por deslocamento
-  window.scrollTo(0, 0);
+      window.scrollTo(0, 0);
 
-  const paginas = document.querySelectorAll(".a4-page");
-  if (!paginas || paginas.length === 0) {
-    alert("Nenhuma página encontrada.");
-    btn.innerText = "📥 Baixar PDF";
-    btn.disabled = false;
-    return;
-  }
-
-  const titulo = document.getElementById("tituloProva")?.value.trim() || "prova";
-  const nomeArquivo = `${titulo.toLowerCase().replace(/\s+/g, '_')}.pdf`;
-
-  try {
-    // 1. Instancia o jsPDF
-    const pdf = new jspdf.jsPDF('p', 'mm', 'a4');
-
-    for (let i = 0; i < paginas.length; i++) {
-      const pagina = paginas[i];
-      const wrapper = pagina.parentElement;
-
-      // Guarda os estilos visuais originais
-      const transformOrig = pagina.style.transform;
-      const displayOrig = pagina.style.display;
-      const positionOrig = pagina.style.position;
-      const wrapperWidthOrig = wrapper ? wrapper.style.width : '';
-      const wrapperHeightOrig = wrapper ? wrapper.style.height : '';
-
-      // 2. FORÇA A PÁGINA A FICAR VISÍVEL E NO TAMANHO A4 REAL NA TELA
-      pagina.style.display = "block";
-      pagina.style.transform = "none";
-      pagina.style.position = "relative";
-      pagina.style.opacity = "1";
-async function gerarPDFDireto() {
-  const btn = document.getElementById("btnDownloadPDF");
-  btn.innerText = "⏳ Gerando PDF...";
-  btn.disabled = true;
-
-  window.scrollTo(0, 0);
-
-  const paginas = document.querySelectorAll(".a4-page");
-  if (!paginas || paginas.length === 0) {
-    alert("Nenhuma página encontrada.");
-    btn.innerText = "📥 Baixar PDF";
-    btn.disabled = false;
-    return;
-  }
-
-  const titulo = document.getElementById("tituloProva")?.value.trim() || "prova";
-  const nomeArquivo = `${titulo.toLowerCase().replace(/\s+/g, '_')}.pdf`;
-
-  try {
-    // Acessa a biblioteca jsPDF instalada no escopo global
-    const jsPDFLib = window.jspdf ? window.jspdf.jsPDF : window.jsPDF;
-    if (!jsPDFLib) {
-      throw new Error("Biblioteca jsPDF não foi encontrada.");
-    }
-
-    const pdf = new jsPDFLib('p', 'mm', 'a4');
-
-    for (let i = 0; i < paginas.length; i++) {
-      const pagina = paginas[i];
-      const wrapper = pagina.parentElement;
-
-      // Guarda os estilos originais
-      const transformOrig = pagina.style.transform;
-      const displayOrig = pagina.style.display;
-      const positionOrig = pagina.style.position;
-      const wrapperWidthOrig = wrapper ? wrapper.style.width : '';
-      const wrapperHeightOrig = wrapper ? wrapper.style.height : '';
-
-      // Torna a folha visível e no tamanho real A4
-      pagina.style.display = "block";
-      pagina.style.transform = "none";
-      pagina.style.position = "relative";
-      pagina.style.opacity = "1";
-      pagina.style.visibility = "visible";
-      
-      if (wrapper) {
-        wrapper.style.display = "block";
-        wrapper.style.width = "210mm";
-        wrapper.style.height = "297mm";
+      const paginas = document.querySelectorAll(".a4-page");
+      if (!paginas || paginas.length === 0) {
+        alert("Nenhuma página encontrada para exportar.");
+        btn.innerText = "📥 Baixar PDF";
+        btn.disabled = false;
+        return;
       }
 
-      // Aguarda a renderização no navegador
-      await new Promise(resolve => setTimeout(resolve, 150));
-async function gerarPDFDireto() {
-  const btn = document.getElementById("btnDownloadPDF");
-  btn.innerText = "⏳ Gerando PDF...";
-  btn.disabled = true;
+      const titulo = document.getElementById("tituloProva")?.value.trim() || "prova";
+      const nomeArquivo = `${titulo.toLowerCase().replace(/\s+/g, '_')}.pdf`;
 
-  // Garante topo da página
-  window.scrollTo(0, 0);
+      // Monta container temporário limpo sem transformações de tela
+      const tempArea = document.createElement("div");
+      tempArea.style.position = "absolute";
+      tempArea.style.top = "0";
+      tempArea.style.left = "0";
+      tempArea.style.zIndex = "-9999";
+      tempArea.style.width = "210mm";
+      tempArea.style.background = "#ffffff";
 
-  const paginas = document.querySelectorAll(".a4-page");
-  if (!paginas || paginas.length === 0) {
-    alert("Nenhuma página encontrada para exportar.");
-    btn.innerText = "📥 Baixar PDF";
-    btn.disabled = false;
-    return;
-  }
-
-  const titulo = document.getElementById("tituloProva")?.value.trim() || "prova";
-  const nomeArquivo = `${titulo.toLowerCase().replace(/\s+/g, '_')}.pdf`;
-
-  // Criamos um container temporário visível no fluxo leve para a captura
-  const tempArea = document.createElement("div");
-  tempArea.style.position = "absolute";
-  tempArea.style.top = "0";
-  tempArea.style.left = "0";
-  tempArea.style.zIndex = "-9999";
-  tempArea.style.width = "210mm";
-  tempArea.style.background = "#ffffff";
-
-  paginas.forEach((pag, idx) => {
-    const clone = pag.cloneNode(true);
-    clone.style.transform = "none";
-    clone.style.display = "block";
-    clone.style.margin = "0";
-    clone.style.boxShadow = "none";
-    clone.style.width = "210mm";
-    clone.style.height = "297mm";
-    clone.style.boxSizing = "border-box";
-    
-    // Força a quebra de página exata do PDF
-    if (idx < paginas.length - 1) {
-      clone.style.pageBreakAfter = "always";
-      clone.style.breakAfter = "page";
-    }
-
-    tempArea.appendChild(clone);
-  });
-
-  document.body.appendChild(tempArea);
-
-  // Configuração otimizada para navegadores móveis (Android Chrome)
-  const opt = {
-    margin: 0,
-    filename: nomeArquivo,
-    image: { type: 'jpeg', quality: 0.98 },
-    html2canvas: {
-      scale: 1.5,
-      useCORS: true,
-      logging: false,
-      scrollX: 0,
-      scrollY: 0
-    },
-    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-  };
-
-  try {
-    // Dispara a geração usando a biblioteca unificada html2pdf
-    await html2pdf().set(opt).from(tempArea).save();
-  } catch (erro) {
-    console.error("Erro ao gerar o PDF:", erro);
-    alert("Não foi possível gerar o PDF. Verifique se o navegador bloqueou o download.");
-  } finally {
-    // Limpeza da área temporária e restauração dos botões
-    if (document.body.contains(tempArea)) {
-      document.body.removeChild(tempArea);
-    }
-    btn.innerText = "📥 Baixar PDF";
-    btn.disabled = false;
-    if (typeof ajustarEscolaMobile === "function") {
-      ajustarEscolaMobile();
-    }
-  }
-      }
-      
-      
-    
+      paginas.forEach((pag, idx) => {
+        const clone = pag.cloneNode(true);
+        clone.style.transform = "none";
+        clone.style.display = "block";
+        clone.style.margin = "0";
+        clone.style.boxShadow = "none";
+        clone.style.width = "210mm";
+        clone.style.height = "297mm";
+        clone.style.boxSizing = "border-box";
         
-    
+        if (idx < paginas.length - 1) {
+          clone.style.pageBreakAfter = "always";
+          clone.style.breakAfter = "page";
+        }
+
+        tempArea.appendChild(clone);
+      });
+
+      document.body.appendChild(tempArea);
+
+      const opt = {
+        margin: 0,
+        filename: nomeArquivo,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: {
+          scale: 1.5,
+          useCORS: true,
+          logging: false,
+          scrollX: 0,
+          scrollY: 0
+        },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      };
+
+      try {
+        await html2pdf().set(opt).from(tempArea).save();
+      } catch (erro) {
+        console.error("Erro ao gerar o PDF:", erro);
+        alert("Não foi possível gerar o PDF. Verifique se o navegador bloqueou o download.");
+      } finally {
+        if (document.body.contains(tempArea)) {
+          document.body.removeChild(tempArea);
+        }
+        btn.innerText = "📥 Baixar PDF";
+        btn.disabled = false;
+        ajustarEscolaMobile();
+      }
+    }
+
     window.addEventListener('scroll', function() {
       const vis = document.getElementById("visualizacaoProva");
       if (vis && vis.style.display !== "none") {
