@@ -1078,7 +1078,7 @@
       document.getElementById("editor").style.display = "block";
     }
 
-            /* GERAÇÃO DE PDF PÁGINA A PÁGINA (SEM PÁGINAS EM BRANCO) */
+                /* GERAÇÃO DE PDF ISOLADA FOLHA POR FOLHA (SEM CORTES E SEM ENCAVALAR) */
     async function gerarPDFDireto() {
       const btn = document.getElementById("btnDownloadPDF");
       btn.innerText = "⏳ Gerando PDF...";
@@ -1092,64 +1092,78 @@
         return;
       }
 
-      // 1. Remove temporariamente as escalas de zoom mobile
-      paginas.forEach(p => {
-        p.style.transform = "none";
-      });
-
       const titulo = document.getElementById("tituloProva").value.trim() || "prova";
       const nomeArquivo = `${titulo.toLowerCase().replace(/\s+/g, '_')}.pdf`;
 
       try {
         const { jsPDF } = window.jspdf || { jsPDF: window.jsPDF };
-        const pdf = new jsPDF('p', 'mm', 'a4');
+        const pdf = new jsPDF({
+          orientation: 'portrait',
+          unit: 'mm',
+          format: 'a4',
+          compress: true
+        });
 
+        // Loop por cada folha criada
         for (let i = 0; i < paginas.length; i++) {
-          const pagina = paginas[i];
+          const paginaOriginal = paginas[i];
 
-          // Gera a imagem do elemento A4 exato
-          const canvas = await html2canvas(pagina, {
+          // 1. Cria um container temporário e limpo no corpo do documento
+          const containerTemp = document.createElement("div");
+          containerTemp.style.position = "fixed";
+          containerTemp.style.left = "-9999px";
+          containerTemp.style.top = "0";
+          containerTemp.style.width = "794px";
+          containerTemp.style.height = "1123px";
+          containerTemp.style.backgroundColor = "#ffffff";
+          containerTemp.style.zIndex = "-9999";
+          containerTemp.style.overflow = "hidden";
+
+          // 2. Clona a página para não sofrer interferências de scroll ou escala mobile
+          const clonePagina = paginaOriginal.cloneNode(true);
+          clonePagina.style.transform = "none";
+          clonePagina.style.margin = "0";
+          clonePagina.style.boxSizing = "border-box";
+          clonePagina.style.width = "794px";
+          clonePagina.style.height = "1123px";
+
+          containerTemp.appendChild(clonePagina);
+          document.body.appendChild(containerTemp);
+
+          // 3. Captura o snapshot exato da folha isolada
+          const canvas = await html2canvas(clonePagina, {
             scale: 2,
             useCORS: true,
             logging: false,
-            scrollX: 0,
-            scrollY: 0,
-            windowWidth: 794
+            width: 794,
+            height: 1123,
+            windowWidth: 794,
+            windowHeight: 1123
           });
+
+          // Remove o elemento temporário da memória
+          document.body.removeChild(containerTemp);
 
           const imgData = canvas.toDataURL('image/jpeg', 0.98);
 
           if (i > 0) {
-            pdf.addPage();
+            pdf.addPage('a4', 'portrait');
           }
 
-          // Desenha a imagem ocupando exatamente o tamanho A4 (210mm x 297mm)
+          // Adiciona a imagem cobrindo exatamente os 210x297mm do A4
           pdf.addImage(imgData, 'JPEG', 0, 0, 210, 297);
         }
 
         pdf.save(nomeArquivo);
       } catch (err) {
-        // Fallback caso jsPDF direto não esteja escopado globalmente
         console.error(err);
-        alert("Erro ao processar PDF. Tentando método secundário...");
-        
-        const elemento = document.getElementById("documento-paginado");
-        const opcoes = {
-          margin: 0,
-          filename: nomeArquivo,
-          image: { type: 'jpeg', quality: 0.98 },
-          html2canvas: { scale: 2, useCORS: true, scrollX: 0, scrollY: 0 },
-          jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-          pagebreak: { mode: 'avoid-all' }
-        };
-        await html2pdf().set(opcoes).from(elemento).save();
+        alert("Erro ao processar o PDF. Verifique os dados e tente novamente.");
       } finally {
         btn.innerText = "📥 Baixar PDF";
         btn.disabled = false;
         ajustarEscolaMobile();
       }
     }
-  
   
     window.addEventListener('scroll', function() {
       const vis = document.getElementById("visualizacaoProva");
