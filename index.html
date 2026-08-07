@@ -1078,7 +1078,7 @@
       document.getElementById("editor").style.display = "block";
     }
 
-    /* GERAÇÃO DIRETA DE PDF (SEM CORTE DE MARGEM) */
+        /* GERAÇÃO DE PDF MULTI-PÁGINAS CORRIGIDA */
     function gerarPDFDireto() {
       const elemento = document.getElementById("documento-paginado");
       const btn = document.getElementById("btnDownloadPDF");
@@ -1086,9 +1086,19 @@
       btn.innerText = "⏳ Gerando PDF...";
       btn.disabled = true;
 
+      // 1. Remove temporariamente as escalas de zoom mobile
+      const wrappers = document.querySelectorAll(".page-wrapper");
       const paginas = document.querySelectorAll(".a4-page");
+      
       paginas.forEach(p => {
         p.style.transform = "none";
+      });
+
+      wrappers.forEach(w => {
+        w.style.width = "210mm";
+        w.style.height = "297mm";
+        w.style.pageBreakAfter = "always";
+        w.style.breakAfter = "page";
       });
 
       const titulo = document.getElementById("tituloProva").value.trim() || "prova";
@@ -1098,7 +1108,8 @@
         filename:     `${titulo.toLowerCase().replace(/\s+/g, '_')}.pdf`,
         image:        { type: 'jpeg', quality: 0.98 },
         html2canvas:  { scale: 2, useCORS: true, logging: false, scrollX: 0, scrollY: 0 },
-        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
+        pagebreak:    { mode: ['css', 'legacy'], before: '.page-wrapper' }
       };
 
       html2pdf().set(opcoes).from(elemento).save().then(function() {
@@ -1112,7 +1123,7 @@
         ajustarEscolaMobile();
       });
     }
-
+  
     window.addEventListener('scroll', function() {
       const vis = document.getElementById("visualizacaoProva");
       if (vis && vis.style.display !== "none") {
