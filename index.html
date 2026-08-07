@@ -1108,72 +1108,85 @@
 
     /* GERAÇÃO NATIVA E ISOLADA DE PDF (SEM CORTES OU PÁGINAS EXTRA) */
     async function gerarPDFDireto() {
-      const btn = document.getElementById("btnDownloadPDF");
-      btn.innerText = "⏳ Gerando PDF...";
-      btn.disabled = true;
+  const btn = document.getElementById("btnDownloadPDF");
+  btn.innerText = "⏳ Gerando PDF...";
+  btn.disabled = true;
 
-      const paginas = Array.from(document.querySelectorAll(".a4-page"));
-      if (paginas.length === 0) {
-        alert("Nenhuma página para gerar.");
-        btn.innerText = "📥 Baixar PDF";
-        btn.disabled = false;
-        return;
-      }
+  const paginas = document.querySelectorAll(".a4-page");
+  if (paginas.length === 0) {
+    alert("Nenhuma página para gerar.");
+    btn.innerText = "📥 Baixar PDF";
+    btn.disabled = false;
+    return;
+  }
 
-      const titulo = document.getElementById("tituloProva").value.trim() || "prova";
-      const nomeArquivo = `${titulo.toLowerCase().replace(/\s+/g, '_')}.pdf`;
+  const titulo = document.getElementById("tituloProva").value.trim() || "prova";
+  const nomeArquivo = `${titulo.toLowerCase().replace(/\s+/g, '_')}.pdf`;
 
-      try {
-        const estilosOriginais = paginas.map(p => ({
-          display: p.style.display,
-          transform: p.style.transform
-        }));
+  // 1. Criar um container temporário para a renderização limpa
+  const containerTemp = document.createElement("div");
+  containerTemp.id = "pdf-temp-container";
+  containerTemp.style.position = "absolute";
+  containerTemp.style.left = "-9999px";
+  containerTemp.style.top = "0";
+  containerTemp.style.width = "210mm";
+  containerTemp.style.background = "#ffffff";
 
-        let worker = html2pdf().set({
-          margin: 0,
-          filename: nomeArquivo,
-          image: { type: 'jpeg', quality: 0.98 },
-          html2canvas: { scale: 2, useCORS: true, logging: false, scrollX: 0, scrollY: 0 },
-          jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-        });
+  // 2. Clona cada folha A4 e remove qualquer transformação mobile (scale)
+  paginas.forEach(p => {
+    const clone = p.cloneNode(true);
+    clone.style.display = "block";
+    clone.style.transform = "none";
+    clone.style.margin = "0";
+    clone.style.boxShadow = "none";
+    
+    // Força cores e visibilidade no canvas do Android
+    clone.style.color = "#000000";
+    clone.style.backgroundColor = "#ffffff";
+    
+    // Adiciona quebra de página nativa do html2pdf
+    clone.style.pageBreakAfter = "always";
+    clone.style.breakAfter = "page";
 
-        paginas.forEach(p => {
-          p.style.display = "none";
-          p.style.transform = "none";
-        });
+    containerTemp.appendChild(clone);
+  });
 
-        for (let i = 0; i < paginas.length; i++) {
-          const pagina = paginas[i];
-          pagina.style.display = "block";
+  document.body.appendChild(containerTemp);
 
-          if (i === 0) {
-            worker = worker.from(pagina).toPdf();
-          } else {
-            worker = worker.toPdf().get('pdf').then(pdf => {
-              pdf.addPage('a4', 'portrait');
-            }).from(pagina).toContainer().toCanvas().toPdf();
-          }
+  // 3. Configurações otimizadas do html2pdf para Android
+  const opt = {
+    margin: 0,
+    filename: nomeArquivo,
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: {
+      scale: 2,
+      useCORS: true,
+      logging: false,
+      scrollX: 0,
+      scrollY: 0,
+      windowWidth: 1024 // Força largura de desktop para o renderizador
+    },
+    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+    pagebreak: { mode: ['css', 'legacy'] }
+  };
 
-          pagina.style.display = "none";
-        }
-
-        await worker.save();
-
-        paginas.forEach((p, idx) => {
-          p.style.display = estilosOriginais[idx].display;
-          p.style.transform = estilosOriginais[idx].transform;
-        });
-
-      } catch (err) {
-        console.error(err);
-        alert("Ocorreu um erro ao gerar o arquivo. Tente novamente.");
-      } finally {
-        btn.innerText = "📥 Baixar PDF";
-        btn.disabled = false;
-        ajustarEscolaMobile();
-      }
+  try {
+    // 4. Gera o PDF direto do container clonado
+    await html2pdf().set(opt).from(containerTemp).save();
+  } catch (err) {
+    console.error(err);
+    alert("Ocorreu um erro ao gerar o arquivo PDF. Tente novamente.");
+  } finally {
+    // 5. Remove o container temporário e restaura o botão
+    if (document.getElementById("pdf-temp-container")) {
+      document.body.removeChild(containerTemp);
     }
-
+    btn.innerText = "📥 Baixar PDF";
+    btn.disabled = false;
+    ajustarEscolaMobile();
+  }
+    }
+    
     window.addEventListener('scroll', function() {
       const vis = document.getElementById("visualizacaoProva");
       if (vis && vis.style.display !== "none") {
