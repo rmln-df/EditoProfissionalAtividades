@@ -578,7 +578,8 @@
       document.getElementById("respostaCE").value = "";
       document.getElementById("respostaVF").value = "";
       alternarCamposTipo();
-        function renderizarListaEditor() {
+      }
+  function renderizarListaEditor() {
       let lista = document.getElementById("listaQuestoes");
       if (questoesArray.length === 0) {
         lista.innerHTML = '<p style="color:#777;text-align:center;">Nenhuma questão adicionada.</p>';
@@ -835,8 +836,9 @@
         localStorage.setItem("bancoQuestoes", JSON.stringify(banco));
         renderizarBancoQuestoes();
       }
-  }
-      function excluirTodasQuestoesBanco() {
+    }
+
+    function excluirTodasQuestoesBanco() {
       if (!confirm("Deseja realmente excluir TODAS as questões do Banco de Questões?")) return;
       if (!confirm("Esta ação é definitiva e não poderá ser desfeita. Deseja continuar?")) return;
 
@@ -856,9 +858,8 @@
       a.href = URL.createObjectURL(blob);
       a.download = "backup_provas.json";
       a.click();
-    }
-
-    function importarBackup(e) {
+  }
+  function importarBackup(e) {
       let file = e.target.files[0];
       if (!file) return;
 
@@ -1056,8 +1057,9 @@
           }
         }
       });
-  }
-      function abrirVisualizacao() {
+    }
+
+    function abrirVisualizacao() {
       document.getElementById("editor").style.display = "none";
       document.getElementById("bancoQuestoes").style.display = "none";
       document.getElementById("provasSalvas").style.display = "none";
