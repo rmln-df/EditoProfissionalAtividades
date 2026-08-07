@@ -169,6 +169,7 @@
         </div>
       </div>
     </div>
+
     <!-- PROVAS SALVAS -->
     <div id="provasSalvas" style="display:none;">
       <div class="card">
@@ -347,14 +348,14 @@
         </div>
         <button class="btn btn-full" id="btnDownloadPDF" style="background-color: #2b6cb0; color:white;" onclick="gerarPDFDireto()">📥 Baixar PDF</button>
       </div>
-       <div class="page-scaler">
+
+      <div class="page-scaler">
         <div id="documento-paginado"></div>
       </div>
     </div>
 
   </div>
-
-  <script>
+<script>
     let paginaAtual = 0;
     let questoesArray = [];
     let questaoEmEdicaoId = null;
@@ -424,7 +425,7 @@
       document.getElementById("configuracoes").style.display = "block";
     }
 
-function alternarCard(id, titulo, texto) {
+    function alternarCard(id, titulo, texto) {
       let card = document.getElementById(id);
       let t = document.getElementById(titulo);
       if (card.style.display === "none") {
@@ -561,7 +562,7 @@ function alternarCard(id, titulo, texto) {
         </button>
       `;
     }
-function limparFormulario() {
+    function limparFormulario() {
       document.getElementById("titulo").value = "";
       document.getElementById("enunciado").value = "";
       document.getElementById("tipo").value = "dissertativa";
@@ -577,9 +578,7 @@ function limparFormulario() {
       document.getElementById("respostaCE").value = "";
       document.getElementById("respostaVF").value = "";
       alternarCamposTipo();
-    }
-
-    function renderizarListaEditor() {
+        function renderizarListaEditor() {
       let lista = document.getElementById("listaQuestoes");
       if (questoesArray.length === 0) {
         lista.innerHTML = '<p style="color:#777;text-align:center;">Nenhuma questão adicionada.</p>';
@@ -643,6 +642,7 @@ function limparFormulario() {
         data: document.getElementById("data").value,
         questoes: questoesArray
       };
+
       let provasSalvas = JSON.parse(localStorage.getItem("provasSalvas") || "[]");
       let index = provasSalvas.findIndex(p => p.id === provaData.id);
       
@@ -656,7 +656,7 @@ function limparFormulario() {
       alert("✅ Prova '" + titulo + "' salva com sucesso no dispositivo!");
     }
 
-function renderizarProvasSalvas() {
+    function renderizarProvasSalvas() {
       let lista = document.getElementById("listaProvasSalvas");
       let provasSalvas = JSON.parse(localStorage.getItem("provasSalvas") || "[]");
 
@@ -682,6 +682,7 @@ function renderizarProvasSalvas() {
         lista.appendChild(div);
       });
     }
+
     function carregarProva(id) {
       let provasSalvas = JSON.parse(localStorage.getItem("provasSalvas") || "[]");
       let prova = provasSalvas.find(p => p.id === id);
@@ -776,7 +777,6 @@ function renderizarProvasSalvas() {
         check.closest('.item-salvo').classList.remove("selecionado");
       });
     }
-
     function importarSelecionadas() {
       let marcadas = document.querySelectorAll(".checkQuestao:checked");
 
@@ -835,9 +835,8 @@ function renderizarProvasSalvas() {
         localStorage.setItem("bancoQuestoes", JSON.stringify(banco));
         renderizarBancoQuestoes();
       }
-    }
-
-    function excluirTodasQuestoesBanco() {
+  }
+      function excluirTodasQuestoesBanco() {
       if (!confirm("Deseja realmente excluir TODAS as questões do Banco de Questões?")) return;
       if (!confirm("Esta ação é definitiva e não poderá ser desfeita. Deseja continuar?")) return;
 
@@ -884,7 +883,7 @@ function renderizarProvasSalvas() {
       }
     }
 
-    /* PAGINAÇÃO COM NUMERAÇÃO AUTOMÁTICA */
+    /* PAGINAÇÃO COM NUMERAÇÃO AUTOMÁTICA E MARGEM DE CORTE CORRIGIDA */
     function paginarDocumento() {
       const containerDoc = document.getElementById('documento-paginado');
       containerDoc.innerHTML = '';
@@ -896,8 +895,9 @@ function renderizarProvasSalvas() {
         return;
       }
 
-      const LIMITE_ALTURA_PAG1 = 1600;
-      const LIMITE_ALTURA_OUTRAS = 1850;
+      // Limites ajustados para evitar cortes ao gerar o PDF em dispositivos móveis
+      const LIMITE_ALTURA_PAG1 = 1380;
+      const LIMITE_ALTURA_OUTRAS = 1600;
 
       let paginaIndex = 1;
       let novaPagina = criarEstruturaPagina(paginaIndex);
@@ -943,6 +943,7 @@ function renderizarProvasSalvas() {
       atualizarNavegacao();
       ajustarEscolaMobile();
     }
+
     function criarEstruturaPagina(numPagina) {
       const page = document.createElement('div');
       page.className = 'a4-page';
@@ -1055,9 +1056,8 @@ function renderizarProvasSalvas() {
           }
         }
       });
-    }
-
-    function abrirVisualizacao() {
+  }
+      function abrirVisualizacao() {
       document.getElementById("editor").style.display = "none";
       document.getElementById("bancoQuestoes").style.display = "none";
       document.getElementById("provasSalvas").style.display = "none";
@@ -1076,7 +1076,7 @@ function renderizarProvasSalvas() {
       document.getElementById("editor").style.display = "block";
     }
 
-    /* GERAÇÃO DIRETA DE PDF */
+    /* GERAÇÃO DIRETA DE PDF (SEM CORTE DE MARGEM) */
     function gerarPDFDireto() {
       const elemento = document.getElementById("documento-paginado");
       const btn = document.getElementById("btnDownloadPDF");
@@ -1095,7 +1095,7 @@ function renderizarProvasSalvas() {
         margin:       0,
         filename:     `${titulo.toLowerCase().replace(/\s+/g, '_')}.pdf`,
         image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 2, useCORS: true, logging: false },
+        html2canvas:  { scale: 2, useCORS: true, logging: false, scrollX: 0, scrollY: 0 },
         jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
       };
 
