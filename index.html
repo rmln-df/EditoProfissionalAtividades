@@ -340,9 +340,8 @@
             </div>
           </div>
         </div>
-      </div>
-
-      <!-- CARD NOVA QUESTÃO / EDIÇÃO -->
+            </div>
+              <!-- CARD NOVA QUESTÃO / EDIÇÃO -->
       <div class="card">
         <div class="card-titulo" id="tituloQuestao" onclick="alternarCard('novaQuestao','tituloQuestao','➕ Nova Questão / Edição')">
           ➕ Nova Questão / Edição ▶
@@ -367,6 +366,7 @@
             <button class="btn" type="button" onclick="alternarPainelLatex()" style="background:#2b6cb0; color:white; width:100%; padding:8px; margin-bottom:8px;">
               ∑ Inserir Funções Matemática (LaTeX)
             </button>
+
             <div id="painelLatex" class="latex-panel" style="display:none;">
               <span style="font-size: 8.5pt; font-weight: bold; color: #1b365d;">Clique no símbolo para inserir no Enunciado:</span>
               <div class="latex-grid">
@@ -583,7 +583,6 @@
 
       return html;
     }
-
     function alternarPainelLatex() {
       const painel = document.getElementById("painelLatex");
       painel.style.display = (painel.style.display === "none" || painel.style.display === "") ? "block" : "none";
@@ -714,6 +713,7 @@
       };
       reader.readAsDataURL(file);
     }
+
     function atualizarPreviewLogoInstituicao() {
       const logo = localStorage.getItem("logoInstituicao") || "";
       const box = document.getElementById("previewLogoInstituicao");
@@ -899,7 +899,6 @@
       
       alternarCamposTipo();
     }
-
     function renderizarListaEditor() {
       let lista = document.getElementById("listaQuestoes");
       if (questoesArray.length === 0) {
@@ -1157,7 +1156,6 @@
       renderizarBancoQuestoes();
       alert("Questões excluídas com sucesso!");
     }
-
     function excluirQuestaoBanco(id) {
       if (confirm("Remover esta questão do banco de dados local?")) {
         let banco = JSON.parse(localStorage.getItem("bancoQuestoes") || "[]");
@@ -1219,8 +1217,138 @@
        - cada questão recebe seu número pelo índice original
        - nenhuma questão é descartada quando uma coluna fica cheia
     */
-    function paginarDocumen
-      function atualizarNavegacao() {
+    function paginarDocumento() {
+      const containerDoc = document.getElementById('documento-paginado');
+      containerDoc.innerHTML = '';
+
+      if (questoesArray.length === 0) {
+        containerDoc.innerHTML = '<div class="page-wrapper"><div class="a4-page"><p style="text-align:center; padding:20px; color:#666;">Adicione questões para visualizar as folhas.</p></div></div>';
+        atualizarNavegacao();
+        ajustarEscolaMobile();
+        return;
+      }
+
+      let paginaIndex = 1;
+      let wrapper = null;
+      let pagina = null;
+      let colunas = null;
+      let colunaAtual = null;
+
+      function criarNovaFolha() {
+        pagina = criarEstruturaPagina(paginaIndex);
+        wrapper = document.createElement('div');
+        wrapper.className = 'page-wrapper';
+        wrapper.appendChild(pagina);
+        containerDoc.appendChild(wrapper);
+        colunas = pagina.querySelectorAll('.coluna-prova');
+        colunaAtual = 0;
+      }
+
+      criarNovaFolha();
+
+      questoesArray.forEach((q, idx) => {
+        const questaoElem = document.createElement('div');
+        questaoElem.className = 'questao';
+        /* idx + 1 garante numeração contínua, inclusive entre folhas */
+        questaoElem.innerHTML = gerarHtmlQuestao(q, idx + 1);
+
+        let inserida = false;
+
+        while (!inserida) {
+          const coluna = colunas[colunaAtual];
+          coluna.appendChild(questaoElem);
+
+          /* O clientHeight da coluna é a altura física realmente disponível na folha. */
+          const estourou = coluna.scrollHeight > coluna.clientHeight + 1;
+
+          if (!estourou || coluna.children.length === 1) {
+            /* Se a questão sozinha for maior que uma coluna, ela permanece inteira para
+               não ser perdida; a próxima questão seguirá para a próxima coluna/folha. */
+            inserida = true;
+          } else {
+            coluna.removeChild(questaoElem);
+
+            if (colunaAtual === 0) {
+              colunaAtual = 1;
+            } else {
+              paginaIndex++;
+              criarNovaFolha();
+            }
+          }
+        }
+      });
+
+      atualizarNavegacao();
+      ajustarEscolaMobile();
+    }
+
+    function criarEstruturaPagina(numPagina) {
+      const page = document.createElement('div');
+      page.className = 'a4-page';
+      page.id = `pagina-a4-${numPagina}`;
+
+      let headerHtml = '';
+      let alturaColuna = '';
+
+      let tituloVal = document.getElementById("tituloProva").value.trim() || 'AVALIAÇÃO';
+      let disciplinaVal = document.getElementById("disciplina").value.trim() || 'Geral';
+      let professorVal = document.getElementById("professor").value.trim();
+      let turmaVal = document.getElementById("turma").value.trim();
+      let logoInstituicao = localStorage.getItem("logoInstituicao") || "";
+
+      let dataRaw = document.getElementById("data").value;
+      let dataVal = "____/____/________";
+      if (dataRaw) {
+        const partes = dataRaw.split("-");
+        if (partes.length === 3) dataVal = `${partes[2]}/${partes[1]}/${partes[0]}`;
+      }
+
+      if (numPagina === 1) {
+        const logoHtml = logoInstituicao ? `<img class="header-logo" src="${logoInstituicao}" alt="Logo da instituição">` : "";
+        headerHtml = `
+          <div class="header-bar">
+            ${logoHtml}
+            <div class="header-bar-conteudo">
+              <h1>${tituloVal}</h1>
+              <p>${disciplinaVal}</p>
+            </div>
+          </div>
+          <div class="student-info">
+            <table>
+              <tr>
+                <td style="width: 50%;"><strong>Estudante:</strong> _____________________________________</td>
+                <td style="width: 50%;"><strong>Professor(a):</strong> ${professorVal}</td>
+              </tr>
+              <tr>
+                <td style="width: 33%;"><strong>Data:</strong> ${dataVal}</td>
+                <td style="width: 33%;"><strong>Turma:</strong> ${turmaVal}</td>
+                <td style="width: 34%;"><strong>Nota:</strong> _________</td>
+              </tr>
+            </table>
+          </div>
+        `;
+        alturaColuna = 'calc(297mm - 55mm)';
+      } else {
+        headerHtml = `
+          <div class="continuation-bar">
+            <span><strong>${disciplinaVal}</strong> - Continuação</span>
+            <span>Folha ${numPagina}</span>
+          </div>
+        `;
+        alturaColuna = 'calc(297mm - 32mm)';
+      }
+
+      page.innerHTML = `
+        ${headerHtml}
+        <div class="columns-container" style="height:${alturaColuna};">
+          <div class="coluna-prova"></div>
+          <div class="coluna-prova"></div>
+        </div>
+      `;
+      return page;
+    }
+
+    function atualizarNavegacao() {
       const paginas = document.querySelectorAll('.a4-page');
       const indicator = document.getElementById('page-indicator');
       const btnPrev = document.getElementById('btn-prev');
@@ -1557,7 +1685,7 @@
       preview.style.display = 'block';
     }
 
-    function visualizarGabarito(id) {
+     function visualizarGabarito(id) {
       const q = questoesArray.find(item => item.id === id);
       if (!q) return;
       const modal = document.getElementById('modalGabarito');
