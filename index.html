@@ -322,8 +322,8 @@
             </div>
           </div>
         </div>
-          </div>
-          <!-- CARD NOVA QUESTÃO / EDIÇÃO -->
+              </div>
+               <!-- CARD NOVA QUESTÃO / EDIÇÃO -->
       <div class="card">
         <div class="card-titulo" id="tituloQuestao" onclick="alternarCard('novaQuestao','tituloQuestao','➕ Nova Questão / Edição')">
           ➕ Nova Questão / Edição ▶
@@ -483,8 +483,9 @@
             </div>
           </div>
         </div>
-                  </div>
-                   <!-- CARD QUESTÕES ADICIONADAS -->
+      </div>
+
+      <!-- CARD QUESTÕES ADICIONADAS -->
       <div class="card">
         <div class="card-titulo">📋 Questões Adicionadas</div>
         <div class="card-conteudo">
@@ -499,9 +500,8 @@
             </button>
           </div>
         </div>
-      </div>
-
-      <div style="width: 210mm; max-width: 95%; margin: 0 auto 18px auto;">
+  </div>
+   <div style="width: 210mm; max-width: 95%; margin: 0 auto 18px auto;">
         <button class="btn" style="background:#1b365d; color:white; width:100%; padding: 14px; font-size: 11pt; border-radius: 10px;" onclick="voltarMenu()">
           ⬅ Voltar ao Menu
         </button>
@@ -863,6 +863,7 @@
       
       alternarCamposTipo();
     }
+
     function renderizarListaEditor() {
       let lista = document.getElementById("listaQuestoes");
       if (questoesArray.length === 0) {
@@ -897,7 +898,6 @@
         renderizarListaEditor();
       }
     }
-
     function limparTodasQuestoesProva() {
       if (questoesArray.length === 0) {
         alert("A prova já está vazia.");
@@ -1197,6 +1197,7 @@
       let pagina = null;
       let colunas = null;
       let colunaAtual = null;
+
       function criarNovaFolha() {
         pagina = criarEstruturaPagina(paginaIndex);
         wrapper = document.createElement('div');
@@ -1310,7 +1311,6 @@
       `;
       return page;
     }
-
     function atualizarNavegacao() {
       const paginas = document.querySelectorAll('.a4-page');
       const indicator = document.getElementById('page-indicator');
@@ -1390,16 +1390,91 @@
        no PDF. Isso evita as páginas em branco causadas pela combinação de
        page-break CSS + pagebreak do html2pdf.
     */
+    function carregarScriptPDF(src) {
+      return new Promise((resolve, reject) => {
+        const existente = document.querySelector('script[src="' + src + '"]');
+        if (existente) {
+          if (existente.dataset.carregado === "true") { resolve(); return; }
+          existente.addEventListener("load", () => resolve(), { once: true });
+          existente.addEventListener("error", () => reject(new Error("Falha ao carregar " + src)), { once: true });
+          return;
+        }
+        const script = document.createElement("script");
+        script.src = src;
+        script.async = true;
+        script.onload = () => { script.dataset.carregado = "true"; resolve(); };
+        script.onerror = () => reject(new Error("Falha ao carregar " + src));
+        document.head.appendChild(script);
+      });
+    }
+
+    async function garantirBibliotecasPDF() {
+      /* html2pdf.bundle normalmente traz html2canvas e jsPDF juntos.
+         O código também possui fallback para quando o CDN principal demora
+         ou falha no celular. */
+      if (typeof window.html2pdf === "undefined") {
+        const fontes = [
+          "https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js",
+          "https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js"
+        ];
+        let carregou = false;
+        for (const src of fontes) {
+          try {
+            await carregarScriptPDF(src);
+            if (typeof window.html2pdf !== "undefined") { carregou = true; break; }
+          } catch (e) {}
+        }
+        if (!carregou) throw new Error("html2pdf não carregado");
+      }
+
+      if (typeof window.html2canvas === "undefined") {
+        const fontesCanvas = [
+          "https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js",
+          "https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"
+        ];
+        let carregou = false;
+        for (const src of fontesCanvas) {
+          try {
+            await carregarScriptPDF(src);
+            if (typeof window.html2canvas !== "undefined") { carregou = true; break; }
+          } catch (e) {}
+        }
+        if (!carregou) throw new Error("html2canvas não carregado");
+      }
+
+      if (typeof window.jspdf === "undefined" && typeof window.jsPDF === "undefined") {
+        const fontesJsPDF = [
+          "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js",
+          "https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"
+        ];
+        let carregou = false;
+        for (const src of fontesJsPDF) {
+          try {
+            await carregarScriptPDF(src);
+            if (typeof window.jspdf !== "undefined" || typeof window.jsPDF !== "undefined") { carregou = true; break; }
+          } catch (e) {}
+        }
+        if (!carregou) throw new Error("jsPDF não carregado");
+      }
+    }
+
     async function gerarPDFDireto() {
       const elemento = document.getElementById("documento-paginado");
       const btn = document.getElementById("btnDownloadPDF");
-      if (!elemento || !window.html2canvas) {
-        alert("A biblioteca de PDF ainda não foi carregada. Tente novamente.");
+      if (!elemento || !btn) return;
+
+      btn.innerText = "⏳ Carregando PDF...";
+      btn.disabled = true;
+
+      try {
+        await garantirBibliotecasPDF();
+      } catch (erroBiblioteca) {
+        console.error("Bibliotecas PDF:", erroBiblioteca);
+        alert("Não foi possível carregar a biblioteca do PDF. Verifique a conexão com a internet e tente novamente.");
+        btn.innerText = "📥 Baixar PDF";
+        btn.disabled = false;
         return;
       }
-
-      btn.innerText = "⏳ Gerando PDF...";
-      btn.disabled = true;
 
       const paginas = Array.from(elemento.querySelectorAll(".a4-page"));
       if (!paginas.length) {
@@ -1519,4 +1594,4 @@
     window.onresize = ajustarEscolaMobile;
   </script>
 </body>
-</html> 
+</html>
