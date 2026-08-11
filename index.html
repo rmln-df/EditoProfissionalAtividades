@@ -322,9 +322,8 @@
             </div>
           </div>
         </div>
-      </div>
-
-      <!-- CARD NOVA QUESTÃO / EDIÇÃO -->
+          </div>
+          <!-- CARD NOVA QUESTÃO / EDIÇÃO -->
       <div class="card">
         <div class="card-titulo" id="tituloQuestao" onclick="alternarCard('novaQuestao','tituloQuestao','➕ Nova Questão / Edição')">
           ➕ Nova Questão / Edição ▶
@@ -364,7 +363,7 @@
                  <button class="btn-latex" type="button" onclick="inserirLatex('\\frac{d}{dx}(x^2 + 3x)')">Derivada função 1</button>
                  <button class="btn-latex" type="button" onclick="inserirLatex('\\frac{d}{dx}(x^2 + 3x)')">Derivada função 2</button>
                  <button class="btn-latex" type="button" onclick="inserirLatex('\\frac{\\partial f}{\\partial x}')">Derivada parcial</button>
-                 <button class="btn-latex" type="button" onclick="inserirLatex('\\sum_{i=1}^{n}')">Somatório</button>
+               <button class="btn-latex" type="button" onclick="inserirLatex('\\sum_{i=1}^{n}')">Somatório</button>
                 <button class="btn-latex" type="button" onclick="inserirLatex('\\lim_{x \\to 0}')">Limite</button>
                 <button class="btn-latex" type="button" onclick="inserirLatex('\\alpha')">alfa</button>
                 <button class="btn-latex" type="button" onclick="inserirLatex('\\beta')">beta</button>
@@ -484,9 +483,8 @@
             </div>
           </div>
         </div>
-      </div>
-
-      <!-- CARD QUESTÕES ADICIONADAS -->
+                  </div>
+                   <!-- CARD QUESTÕES ADICIONADAS -->
       <div class="card">
         <div class="card-titulo">📋 Questões Adicionadas</div>
         <div class="card-conteudo">
@@ -621,6 +619,7 @@
       document.getElementById("menuPrincipal").style.display = "none";
       document.getElementById("editor").style.display = "block";
     }
+
     function voltarMenu() {
       if (questaoEmEdicaoId !== null) {
         cancelarEdicao();
@@ -864,7 +863,6 @@
       
       alternarCamposTipo();
     }
-
     function renderizarListaEditor() {
       let lista = document.getElementById("listaQuestoes");
       if (questoesArray.length === 0) {
@@ -943,6 +941,7 @@
       localStorage.setItem("provasSalvas", JSON.stringify(provasSalvas));
       alert("✅ Prova '" + titulo + "' salva com sucesso no dispositivo!");
     }
+
     function renderizarProvasSalvas() {
       let lista = document.getElementById("listaProvasSalvas");
       let provasSalvas = JSON.parse(localStorage.getItem("provasSalvas") || "[]");
@@ -1198,7 +1197,6 @@
       let pagina = null;
       let colunas = null;
       let colunaAtual = null;
-
       function criarNovaFolha() {
         pagina = criarEstruturaPagina(paginaIndex);
         wrapper = document.createElement('div');
@@ -1312,6 +1310,7 @@
       `;
       return page;
     }
+
     function atualizarNavegacao() {
       const paginas = document.querySelectorAll('.a4-page');
       const indicator = document.getElementById('page-indicator');
@@ -1387,13 +1386,14 @@
     }
 
     /* GERAÇÃO DIRETA DE PDF
-       Cada .page-wrapper representa exatamente uma folha A4.
-       As regras de quebra impedem que o html2pdf transforme todas as folhas em uma só.
+       Cada .a4-page é capturada individualmente e inserida como UMA página
+       no PDF. Isso evita as páginas em branco causadas pela combinação de
+       page-break CSS + pagebreak do html2pdf.
     */
-    function gerarPDFDireto() {
+    async function gerarPDFDireto() {
       const elemento = document.getElementById("documento-paginado");
       const btn = document.getElementById("btnDownloadPDF");
-      if (!elemento || !window.html2pdf) {
+      if (!elemento || !window.html2canvas) {
         alert("A biblioteca de PDF ainda não foi carregada. Tente novamente.");
         return;
       }
@@ -1401,44 +1401,98 @@
       btn.innerText = "⏳ Gerando PDF...";
       btn.disabled = true;
 
-      const paginas = document.querySelectorAll(".a4-page");
-      paginas.forEach(p => { p.style.transform = "none"; });
+      const paginas = Array.from(elemento.querySelectorAll(".a4-page"));
+      if (!paginas.length) {
+        alert("Não há folhas para gerar o PDF.");
+        btn.innerText = "📥 Baixar PDF";
+        btn.disabled = false;
+        return;
+      }
 
-      /* Durante a captura, elimina o espaçamento externo entre folhas e força
-         o html2pdf a tratar cada wrapper como uma página independente. */
+      /* O html2pdf.bundle disponibiliza o jsPDF em window.jspdf.jsPDF.
+         O segundo caminho mantém compatibilidade com versões que expõem
+         jsPDF diretamente em window. */
+      const JsPDF = (window.jspdf && window.jspdf.jsPDF) || window.jsPDF;
+      if (!JsPDF) {
+        alert("Não foi possível carregar o gerador de PDF. Tente novamente.");
+        btn.innerText = "📥 Baixar PDF";
+        btn.disabled = false;
+        return;
+      }
+
       elemento.classList.add('modo-pdf');
 
-      const titulo = document.getElementById("tituloProva").value.trim() || "prova";
-      const opcoes = {
-        margin: 0,
-        filename: `${titulo.toLowerCase().replace(/[^a-z0-9áéíóúãõçüñ ]/gi, '').trim().replace(/\s+/g, '_') || 'prova'}.pdf`,
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: {
-          scale: 2,
-          useCORS: true,
-          allowTaint: true,
-          logging: false,
-          backgroundColor: '#ffffff',
-          scrollX: 0,
-          scrollY: 0
-        },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait', compress: true },
-        pagebreak: { mode: ['css', 'legacy'], before: '.page-wrapper:not(:first-child)' }
-      };
+      try {
+        /* Remove transformações de visualização apenas durante a captura. */
+        paginas.forEach(pagina => {
+          pagina.style.transform = "none";
+          pagina.style.margin = "0";
+        });
 
-      html2pdf().set(opcoes).from(elemento).save().then(function() {
+        /* Aguarda fontes e imagens do cabeçalho/logo terminarem de carregar. */
+        if (document.fonts && document.fonts.ready) {
+          await document.fonts.ready;
+        }
+        const imagens = Array.from(elemento.querySelectorAll('img'));
+        await Promise.all(imagens.map(img => {
+          if (img.complete) return Promise.resolve();
+          return new Promise(resolve => {
+            img.onload = resolve;
+            img.onerror = resolve;
+          });
+        }));
+
+        const titulo = document.getElementById("tituloProva").value.trim() || "prova";
+        const nomeArquivo = `${titulo.toLowerCase().replace(/[^a-z0-9áéíóúãõçüñ ]/gi, '').trim().replace(/\s+/g, '_') || 'prova'}.pdf`;
+
+        const pdf = new JsPDF({
+          unit: 'mm',
+          format: 'a4',
+          orientation: 'portrait',
+          compress: true
+        });
+
+        for (let i = 0; i < paginas.length; i++) {
+          /* Captura somente a folha atual. Não captura o container inteiro. */
+          const canvas = await window.html2canvas(paginas[i], {
+            scale: 2,
+            useCORS: true,
+            allowTaint: true,
+            logging: false,
+            backgroundColor: '#ffffff',
+            scrollX: 0,
+            scrollY: 0,
+            width: paginas[i].offsetWidth,
+            height: paginas[i].offsetHeight,
+            windowWidth: document.documentElement.clientWidth,
+            windowHeight: document.documentElement.clientHeight
+          });
+
+          const imgData = canvas.toDataURL('image/jpeg', 0.96);
+
+          if (i > 0) {
+            pdf.addPage('a4', 'portrait');
+          }
+
+          /* Uma captura = uma página A4. Assim, não existem páginas vazias
+             entre as folhas preenchidas. */
+          pdf.addImage(imgData, 'JPEG', 0, 0, 210, 297, undefined, 'FAST');
+        }
+
+        pdf.save(nomeArquivo);
+
         elemento.classList.remove('modo-pdf');
         btn.innerText = "📥 Baixar PDF";
         btn.disabled = false;
         ajustarEscolaMobile();
-      }).catch(err => {
-        console.error(err);
+      } catch (err) {
+        console.error('Erro ao gerar PDF:', err);
         elemento.classList.remove('modo-pdf');
+        btn.innerText = "📥 Baixar PDF";
+        btn.disabled = false;
+        ajustarEscolaMobile();
         alert("Ocorreu um erro ao gerar o PDF. Tente novamente.");
-        btn.innerText = "📥 Baixar PDF";
-        btn.disabled = false;
-        ajustarEscolaMobile();
-      });
+      }
     }
 
     window.addEventListener('scroll', function() {
