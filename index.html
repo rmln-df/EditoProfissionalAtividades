@@ -298,8 +298,9 @@
           <button onclick="voltarMenu()" class="btn" style="background:#1b365d; color:white; width: 100%; padding: 12px; margin-top: 15px;">⬅ Voltar ao Menu</button>
         </div>
       </div>
-  </div>
-   <!-- EDITOR DE PROVA -->
+    </div>
+
+    <!-- EDITOR DE PROVA -->
     <div id="editor" style="display:none;">
       
       <!-- CARD DADOS DA PROVA -->
@@ -366,7 +367,6 @@
             <button class="btn" type="button" onclick="alternarPainelLatex()" style="background:#2b6cb0; color:white; width:100%; padding:8px; margin-bottom:8px;">
               ∑ Inserir Funções Matemática (LaTeX)
             </button>
-
             <div id="painelLatex" class="latex-panel" style="display:none;">
               <span style="font-size: 8.5pt; font-weight: bold; color: #1b365d;">Clique no símbolo para inserir no Enunciado:</span>
               <div class="latex-grid">
@@ -471,10 +471,11 @@
                 <option value="FALSO">FALSO</option>
               </select>
             </div>
-             <div id="secaoGabaritoTexto">
+
+            <div id="secaoGabaritoTexto">
               <label for="gabarito">Gabarito / Resposta (Opcional)</label>
-              <textarea id="gabarito" placeholder="Digite a resposta, solução ou observação para consulta. Ex.: x = $\frac{10}{2}$ ou $x^2 + 3x - 4 = 0$. Este conteúdo NÃO será impresso na prova." oninput="atualizarPreviewGabarito()"></textarea>
-         <!--     <small style="display:block;color:#666;margin-top:-8px;margin-bottom:8px;">Aceita LaTeX: use <b>$...$</b> para fórmulas na mesma linha e <b>$$...$$</b> para fórmulas em bloco. A resposta é somente para consulta e não aparece na folha da prova.</small> -->
+              <textarea id="gabarito" placeholder="Digite a resposta, solução ou observação para consulta. Ex.: x = $\frac{10}{2}$ ou $x^2 + 3x - 4 = 0$." oninput="atualizarPreviewGabarito()"></textarea>
+              <small style="display:block;color:#666;margin-top:-8px;margin-bottom:8px;">Use este campo para salvar a resposta ou uma explicação. Ela poderá ser visualizada no editor, sem aparecer na folha da prova.</small>
               <div id="previewGabarito" style="display:none;border:1px dashed #2b6cb0;background:#f8fafc;border-radius:6px;padding:10px;margin-bottom:10px;">
                 <strong style="display:block;color:#1b365d;margin-bottom:6px;">Pré-visualização da resposta:</strong>
                 <div id="previewGabaritoConteudo"></div>
@@ -713,7 +714,6 @@
       };
       reader.readAsDataURL(file);
     }
-
     function atualizarPreviewLogoInstituicao() {
       const logo = localStorage.getItem("logoInstituicao") || "";
       const box = document.getElementById("previewLogoInstituicao");
@@ -866,6 +866,7 @@
 
       document.getElementById("novaQuestao").scrollIntoView({ behavior: 'smooth' });
     }
+
     function cancelarEdicao() {
       questaoEmEdicaoId = null;
       limparFormulario();
@@ -1218,137 +1219,8 @@
        - cada questão recebe seu número pelo índice original
        - nenhuma questão é descartada quando uma coluna fica cheia
     */
-    function paginarDocumento() {
-      const containerDoc = document.getElementById('documento-paginado');
-      containerDoc.innerHTML = '';
-
-      if (questoesArray.length === 0) {
-        containerDoc.innerHTML = '<div class="page-wrapper"><div class="a4-page"><p style="text-align:center; padding:20px; color:#666;">Adicione questões para visualizar as folhas.</p></div></div>';
-        atualizarNavegacao();
-        ajustarEscolaMobile();
-        return;
-      }
-
-      let paginaIndex = 1;
-      let wrapper = null;
-      let pagina = null;
-      let colunas = null;
-      let colunaAtual = null;
-
-      function criarNovaFolha() {
-        pagina = criarEstruturaPagina(paginaIndex);
-        wrapper = document.createElement('div');
-        wrapper.className = 'page-wrapper';
-        wrapper.appendChild(pagina);
-        containerDoc.appendChild(wrapper);
-        colunas = pagina.querySelectorAll('.coluna-prova');
-        colunaAtual = 0;
-      }
-
-      criarNovaFolha();
-
-      questoesArray.forEach((q, idx) => {
-        const questaoElem = document.createElement('div');
-        questaoElem.className = 'questao';
-        /* idx + 1 garante numeração contínua, inclusive entre folhas */
-        questaoElem.innerHTML = gerarHtmlQuestao(q, idx + 1);
-
-        let inserida = false;
-
-        while (!inserida) {
-          const coluna = colunas[colunaAtual];
-          coluna.appendChild(questaoElem);
-
-          /* O clientHeight da coluna é a altura física realmente disponível na folha. */
-          const estourou = coluna.scrollHeight > coluna.clientHeight + 1;
-
-          if (!estourou || coluna.children.length === 1) {
-            /* Se a questão sozinha for maior que uma coluna, ela permanece inteira para
-               não ser perdida; a próxima questão seguirá para a próxima coluna/folha. */
-            inserida = true;
-          } else {
-            coluna.removeChild(questaoElem);
-
-            if (colunaAtual === 0) {
-              colunaAtual = 1;
-            } else {
-              paginaIndex++;
-              criarNovaFolha();
-            }
-          }
-        }
-      });
-
-      atualizarNavegacao();
-      ajustarEscolaMobile();
-    }
-    function criarEstruturaPagina(numPagina) {
-      const page = document.createElement('div');
-      page.className = 'a4-page';
-      page.id = `pagina-a4-${numPagina}`;
-
-      let headerHtml = '';
-      let alturaColuna = '';
-
-      let tituloVal = document.getElementById("tituloProva").value.trim() || 'AVALIAÇÃO';
-      let disciplinaVal = document.getElementById("disciplina").value.trim() || 'Geral';
-      let professorVal = document.getElementById("professor").value.trim();
-      let turmaVal = document.getElementById("turma").value.trim();
-      let logoInstituicao = localStorage.getItem("logoInstituicao") || "";
-
-      let dataRaw = document.getElementById("data").value;
-      let dataVal = "____/____/________";
-      if (dataRaw) {
-        const partes = dataRaw.split("-");
-        if (partes.length === 3) dataVal = `${partes[2]}/${partes[1]}/${partes[0]}`;
-      }
-
-      if (numPagina === 1) {
-        const logoHtml = logoInstituicao ? `<img class="header-logo" src="${logoInstituicao}" alt="Logo da instituição">` : "";
-        headerHtml = `
-          <div class="header-bar">
-            ${logoHtml}
-            <div class="header-bar-conteudo">
-              <h1>${tituloVal}</h1>
-              <p>${disciplinaVal}</p>
-            </div>
-          </div>
-          <div class="student-info">
-            <table>
-              <tr>
-                <td style="width: 50%;"><strong>Estudante:</strong> _____________________________________</td>
-                <td style="width: 50%;"><strong>Professor(a):</strong> ${professorVal}</td>
-              </tr>
-              <tr>
-                <td style="width: 33%;"><strong>Data:</strong> ${dataVal}</td>
-                <td style="width: 33%;"><strong>Turma:</strong> ${turmaVal}</td>
-                <td style="width: 34%;"><strong>Nota:</strong> _________</td>
-              </tr>
-            </table>
-          </div>
-        `;
-        alturaColuna = 'calc(297mm - 55mm)';
-      } else {
-        headerHtml = `
-          <div class="continuation-bar">
-            <span><strong>${disciplinaVal}</strong> - Continuação</span>
-            <span>Folha ${numPagina}</span>
-          </div>
-        `;
-        alturaColuna = 'calc(297mm - 32mm)';
-      }
-
-      page.innerHTML = `
-        ${headerHtml}
-        <div class="columns-container" style="height:${alturaColuna};">
-          <div class="coluna-prova"></div>
-          <div class="coluna-prova"></div>
-        </div>
-      `;
-      return page;
-    }
-
-    function atualizarNavegacao() {
+    function paginarDocumen
+      function atualizarNavegacao() {
       const paginas = document.querySelectorAll('.a4-page');
       const indicator = document.getElementById('page-indicator');
       const btnPrev = document.getElementById('btn-prev');
@@ -1729,4 +1601,4 @@
     window.onresize = ajustarEscolaMobile;
   </script>
 </body>
-</html>  
+</html> 
