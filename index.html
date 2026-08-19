@@ -1052,46 +1052,56 @@
       localStorage.setItem("bancoQuestoes", JSON.stringify(banco));
     }
 
-    /* RENDERIZAÇÃO DO BANCO */
-    function renderizarBancoQuestoes() {
-      let lista = document.getElementById("listaBancoQuestoes");
-      let banco = JSON.parse(localStorage.getItem("bancoQuestoes") || "[]");
+    /* RENDERIZAÇÃO DO BANCO COM ORDENAÇÃO ALFABÉTICA */
+function renderizarBancoQuestoes() {
+  let lista = document.getElementById("listaBancoQuestoes");
+  let banco = JSON.parse(localStorage.getItem("bancoQuestoes") || "[]");
 
-      if (banco.length === 0) {
-        lista.innerHTML = "<p style='text-align:center; color:#666;'>Nenhuma questão salva no banco.</p>";
-        return;
+  if (banco.length === 0) {
+    lista.innerHTML = "<p style='text-align:center; color:#666;'>Nenhuma questão salva no banco.</p>";
+    return;
+  }
+
+  // Ordena alfabeticamente pelo título (considerando 'Questão' para títulos vazios)
+  banco.sort((a, b) => {
+    let tituloA = (a.titulo && a.titulo.trim() !== '') ? a.titulo.trim() : 'Questão';
+    let tituloB = (b.titulo && b.titulo.trim() !== '') ? b.titulo.trim() : 'Questão';
+    return tituloA.localeCompare(tituloB, 'pt-BR', { sensitivity: 'base' });
+  });
+
+  lista.innerHTML = "";
+  banco.forEach(q => {
+    let tituloExibicao = (q.titulo && q.titulo.trim() !== '') ? q.titulo.trim() : 'Questão';
+
+    let div = document.createElement("div");
+    div.className = "item-salvo";
+    div.innerHTML = `
+      <div style="display:flex; align-items:center; gap:12px; flex:1;">
+        <input type="checkbox" class="checkQuestao" value="${q.id}" style="transform:scale(1.3); margin-right:5px; cursor:pointer;">
+        <div>
+          <strong>${tituloExibicao}</strong> - <small>${q.tipo}</small><br>
+          <small style="color:#666;">
+            ${q.enunciado ? q.enunciado.substring(0,50) : ""}...
+          </small>
+        </div>
+      </div>
+      <div>
+        <button class="btn-delete" onclick="excluirQuestaoBanco(${q.id})">🗑 Excluir</button>
+      </div>
+    `;
+    lista.appendChild(div);
+
+    let check = div.querySelector(".checkQuestao");
+    check.addEventListener("change", function() {
+      if (this.checked) {
+        div.classList.add("selecionado");
+      } else {
+        div.classList.remove("selecionado");
       }
-
-      lista.innerHTML = "";
-      banco.forEach(q => {
-        let div = document.createElement("div");
-        div.className = "item-salvo";
-        div.innerHTML = `
-          <div style="display:flex; align-items:center; gap:12px; flex:1;">
-            <input type="checkbox" class="checkQuestao" value="${q.id}" style="transform:scale(1.3); margin-right:5px; cursor:pointer;">
-            <div>
-              <strong>${q.titulo || 'Questão'}</strong> - <small>${q.tipo}</small><br>
-              <small style="color:#666;">
-                ${q.enunciado ? q.enunciado.substring(0,50) : ""}...
-              </small>
-            </div>
-          </div>
-          <div>
-            <button class="btn-delete" onclick="excluirQuestaoBanco(${q.id})">🗑 Excluir</button>
-          </div>
-        `;
-        lista.appendChild(div);
-
-        let check = div.querySelector(".checkQuestao");
-        check.addEventListener("change", function() {
-          if (this.checked) {
-            div.classList.add("selecionado");
-          } else {
-            div.classList.remove("selecionado");
-          }
-        });
-      });
+    });
+  });
     }
+    
 
     /* FUNÇÕES EM LOTE PARA O BANCO DE QUESTÕES */
     function selecionarTodasQuestoes() {
