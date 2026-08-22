@@ -25,17 +25,9 @@
     .btn:disabled { background-color: #a0aec0; color: #666; cursor: not-allowed; }
     .btn-full { width: 100%; max-width: 400px; padding: 10px; font-size: 10pt; }
     
+    .btn-gabarito-item { background-color: #2b6cb0; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 8pt; margin-right: 5px; }
     .btn-edit { background-color: #d69e2e; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 8pt; margin-right: 5px; }
     .btn-delete { background-color: #c53030; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 8pt; }
-    .btn-gabarito { background-color: #2b6cb0; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 8pt; margin-right: 5px; }
-    .btn-gabarito:hover { background-color: #1b365d; }
-    #modalGabarito { position: fixed; inset: 0; background: rgba(0,0,0,.58); display: none; align-items: center; justify-content: center; z-index: 20000; padding: 18px; }
-    #modalGabarito .modal-gabarito-box { background: #fff; width: 100%; max-width: 560px; max-height: 85vh; overflow-y: auto; border-radius: 14px; box-shadow: 0 12px 35px rgba(0,0,0,.35); }
-    #modalGabarito .modal-gabarito-header { background: #1b365d; color: #fff; padding: 14px 16px; display:flex; align-items:center; justify-content:space-between; gap:10px; }
-    #modalGabarito .modal-gabarito-header h3 { margin:0; font-size: 12pt; }
-    #modalGabarito .modal-gabarito-close { background: transparent; color:#fff; border:0; font-size:22px; cursor:pointer; line-height:1; }
-    #modalGabarito .modal-gabarito-body { padding: 16px; color:#1f2937; font-size: 10pt; line-height:1.45; }
-    .resposta-salva { margin: 10px 0; padding: 10px 12px; border-radius: 8px; background:#edf2f7; border-left:4px solid #2b6cb0; }
     
     .page-scaler { width: 100%; margin-top: 105px; padding: 15px 0 50px 0; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; overflow-x: hidden; }
     #documento-paginado { display: flex; flex-direction: column; align-items: center; gap: 20px; width: 100%; }
@@ -66,11 +58,9 @@
       transform-origin: top center;
     }
     
-    .header-bar { background-color: #1b365d; color: #ffffff; text-align: center; padding: 8px 10px; border-radius: 2px; margin-bottom: 10px; flex-shrink: 0; }
-    /* BARRA ÚNICA DO CABEÇALHO: logo e nome da escola na mesma barra */
+    /* BARRA ÚNICA DO CABEÇALHO */
     .header-bar {
-   /*   background-color: #1b365d; */
-      background-color: #2b6cb0;
+      background-color: #1b365d;
       color: #ffffff;
       text-align: center;
       padding: 6px 10px;
@@ -85,12 +75,12 @@
       position: relative;
     }
     .header-logo {
-      width: 140px;
-      height: 80px;
+      width: 48px;
+      height: 48px;
       object-fit: contain;
       flex: 0 0 48px;
       border-radius: 4px;
-/*   background: #ffffff;  */
+      background: #ffffff;
       padding: 2px;
     }
     .header-bar-conteudo {
@@ -104,7 +94,7 @@
     .student-info table { width: 100%; border-collapse: collapse; }
     .continuation-bar { font-size: 8pt; color: #555; display: flex; justify-content: space-between; border-bottom: 1px solid #ccc; padding-bottom: 4px; margin-bottom: 10px; flex-shrink: 0; }
     
-    /* DUAS COLUNAS REAIS: evita que o navegador esconda questões ou altere a paginação */
+    /* DUAS COLUNAS REAIS */
     .columns-container {
       display: grid;
       grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
@@ -141,7 +131,7 @@
     .latex-grid { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
     .btn-latex { background: #ffffff; border: 1px solid #2b6cb0; color: #1b365d; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-size: 8.5pt; font-weight: bold; transition: all 0.2s; }
     .btn-latex:hover { background: #2b6cb0; color: white; }
-    .latex-preview-box { background: white; border: 1px dashed #2b6cb0; padding: 8px; border-radius: 4px; margin-top: 8px; min-height: 35px; font-size: 10pt; }
+    .latex-preview-box { background: white; border: 1px dashed #2b6cb0; padding: 8px; border-radius: 4px; margin-top: 4px; margin-bottom: 12px; min-height: 35px; font-size: 10pt; }
 
     #telaInicial { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg,#1b365d,#2b6cb0); display: flex; flex-direction: column; justify-content: center; align-items: center; color: white; z-index: 99999; }
     #telaInicial h0 { font-size: clamp(70px,10vw,80px); margin-bottom: 10px; text-align: center; }
@@ -156,6 +146,24 @@
     .card { background: #fff; margin: 18px auto; border-radius: 14px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,.15); width: 210mm; max-width: 95%; }
     .card-titulo { background: #1b365d; color: #fff; padding: 15px; font-size: 20px; font-weight: bold; cursor: pointer; }
     .card-conteudo { padding: 20px; }
+    
+    /* CABEÇALHO FIXO PARA O BANCO DE QUESTÕES */
+    .sticky-banco-header {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      background: #1b365d;
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    }
+    .banco-scroll-container {
+      max-height: 60vh;
+      overflow-y: auto;
+      padding-right: 5px;
+    }
+
     .item-salvo { 
       border-left: 6px solid #2b6cb0;
       border-top: 1px solid #dbeafe;
@@ -177,7 +185,7 @@
       box-shadow: 0 6px 15px rgba(37,99,235,.25);
     }
     
-    /* Regras específicas para exportação: 1 wrapper = 1 página A4 */
+    /* Modo PDF */
     #documento-paginado.modo-pdf {
       display: block !important;
       width: 210mm !important;
@@ -221,15 +229,6 @@
 </head>
 
 <body>
-  <div id="modalGabarito" onclick="if(event.target === this) fecharModalGabarito()">
-    <div class="modal-gabarito-box">
-      <div class="modal-gabarito-header">
-        <h3 id="modalGabaritoTitulo">Gabarito</h3>
-        <button type="button" class="modal-gabarito-close" onclick="fecharModalGabarito()" aria-label="Fechar">×</button>
-      </div>
-      <div id="modalGabaritoCorpo" class="modal-gabarito-body"></div>
-    </div>
-  </div>
 
   <div id="telaInicial">
     <h0>📚</h0>
@@ -257,25 +256,31 @@
         <div class="card-titulo">📚 Banco de Questões (Salvas no Aparelho)</div>
         <div class="card-conteudo">
           
-          <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:15px; padding:12px; background:#e6edf7; border:1px solid #b8c7df; border-radius:8px;">
-            <button class="btn" onclick="selecionarTodasQuestoes()" style="background:#2b6cb0; color:white;">☑️ Selecionar Todas</button>
-            <button class="btn" onclick="desmarcarTodasQuestoes()" style="background:#718096; color:white;">⬜ Desmarcar Todas</button>
-            <button class="btn" onclick="importarSelecionadas()" style="background:#38a169; color:white;">➕ Importar Selecionadas</button>
-            <button class="btn" onclick="excluirSelecionadas()" style="background:#c53030; color:white;">🗑️ Excluir Selecionadas</button>
+          <div class="sticky-banco-header">
+            <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:10px;">
+              <button class="btn" onclick="selecionarTodasQuestoes()" style="background:#ffcc00; color:#1b365d; flex:1;">☑️ Selecionar Todas</button>
+              <button class="btn" onclick="desmarcarTodasQuestoes()" style="background:#718096; color:white; flex:1;">⬜ Desmarcar Todas</button>
+              <button class="btn" onclick="importarSelecionadas()" style="background:#38a169; color:white; flex:1;">➕ Importar Selecionadas</button>
+              <button class="btn" onclick="excluirSelecionadas()" style="background:#c53030; color:white; flex:1;">🗑️ Excluir Selecionadas</button>
+            </div>
+            <div style="display:flex; gap:8px;">
+              <button onclick="excluirTodasQuestoesBanco()" class="btn" style="background:#c53030; color:white; flex:1; padding:8px;">
+                🗑 Excluir TODAS as Questões
+              </button>
+              <button onclick="voltarMenu()" class="btn" style="background:#2b6cb0; color:white; flex:1; padding:8px;">
+                ⬅ Voltar ao Menu
+              </button>
+            </div>
           </div>
 
-          <div id="listaBancoQuestoes"></div>
-          
-          <button onclick="excluirTodasQuestoesBanco()" class="btn" style="background:#c53030; color:white; width:100%; padding:12px; margin-top:15px; margin-bottom:10px;">
-            🗑 Excluir TODAS as Questões do Banco
-          </button>
+          <div class="banco-scroll-container">
+            <div id="listaBancoQuestoes"></div>
+          </div>
 
-          <button onclick="voltarMenu()" class="btn" style="background:#1b365d; color:white; width: 100%; padding: 12px; margin-top: 15px;">⬅ Voltar ao Menu</button>
         </div>
       </div>
     </div>
-
-    <!-- PROVAS SALVAS -->
+<!-- PROVAS SALVAS -->
     <div id="provasSalvas" style="display:none;">
       <div class="card">
         <div class="card-titulo">💾 Provas Salvas no Dispositivo</div>
@@ -301,7 +306,7 @@
       </div>
     </div>
 
-    <!-- EDITOR DE PROVA -->
+   " <!-- EDITOR DE PROVA -->
     <div id="editor" style="display:none;">
       
       <!-- CARD DADOS DA PROVA -->
@@ -341,8 +346,9 @@
             </div>
           </div>
         </div>
-            </div>
-              <!-- CARD NOVA QUESTÃO / EDIÇÃO -->
+      </div>
+
+      <!-- CARD NOVA QUESTÃO / EDIÇÃO -->
       <div class="card">
         <div class="card-titulo" id="tituloQuestao" onclick="alternarCard('novaQuestao','tituloQuestao','➕ Nova Questão / Edição')">
           ➕ Nova Questão / Edição ▶
@@ -363,16 +369,14 @@
             <label for="enunciado">Enunciado</label>
             <textarea id="enunciado" placeholder="Digite o texto da questão... (Use $...$ para equações na mesma linha e $$...$$ para linhas isoladas)" oninput="atualizarPreviewLatex()"></textarea>
 
-            <!-- BOTÃO E PAINEL DE INSERÇÃO DE SÍMBOLOS MATEMÁTICOS LATEX -->
             <button class="btn" type="button" onclick="alternarPainelLatex()" style="background:#2b6cb0; color:white; width:100%; padding:8px; margin-bottom:8px;">
               ∑ Inserir Funções Matemática (LaTeX)
             </button>
             
             <div style="margin-top:10px;">
-                <span style="font-size: 8.5pt; font-weight: bold; color: #1b365d;">Pré-visualização do Enunciado:</span>
-                <div id="latexPreview" class="latex-preview-box"></div>
+              <span style="font-size: 8.5pt; font-weight: bold; color: #1b365d;">Pré-visualização do Enunciado:</span>
+              <div id="latexPreview" class="latex-preview-box"></div>
             </div>
-
             <div id="painelLatex" class="latex-panel" style="display:none;">
               <span style="font-size: 8.5pt; font-weight: bold; color: #1b365d;">Clique no símbolo para inserir no Enunciado:</span>
               <div class="latex-grid">
@@ -383,29 +387,29 @@
                 <button class="btn-latex" type="button" onclick="inserirLatex('\\sqrt{x}')">Raiz 1</button>
                 <button class="btn-latex" type="button" onclick="inserirLatex('\\sqrt[n]{x}')">Raiz 2</button>
                 <button class="btn-latex" type="button" onclick="inserirLatex('\\int_{a}^{b}')">Integral</button>
-                 <button class="btn-latex" type="button" onclick="inserirLatex('\\frac{dy}{dx}')">Derivada Simples</button>
-                 <button class="btn-latex" type="button" onclick="inserirLatex('\\frac{d}{dx}(x^2 + 3x)')">Derivada função 1</button>
-                 <button class="btn-latex" type="button" onclick="inserirLatex('\\frac{d}{dx}(x^2 + 3x)')">Derivada função 2</button>
-                 <button class="btn-latex" type="button" onclick="inserirLatex('\\frac{\\partial f}{\\partial x}')">Derivada parcial</button>
-               <button class="btn-latex" type="button" onclick="inserirLatex('\\sum_{i=1}^{n}')">Somatório</button>
+                <button class="btn-latex" type="button" onclick="inserirLatex('\\frac{dy}{dx}')">Derivada Simples</button>
+                <button class="btn-latex" type="button" onclick="inserirLatex('\\frac{d}{dx}(x^2 + 3x)')">Derivada função 1</button>
+                <button class="btn-latex" type="button" onclick="inserirLatex('\\frac{d}{dx}(x^2 + 3x)')">Derivada função 2</button>
+                <button class="btn-latex" type="button" onclick="inserirLatex('\\frac{\\partial f}{\\partial x}')">Derivada parcial</button>
+                <button class="btn-latex" type="button" onclick="inserirLatex('\\sum_{i=1}^{n}')">Somatório</button>
                 <button class="btn-latex" type="button" onclick="inserirLatex('\\lim_{x \\to 0}')">Limite</button>
                 <button class="btn-latex" type="button" onclick="inserirLatex('\\alpha')">alfa</button>
                 <button class="btn-latex" type="button" onclick="inserirLatex('\\beta')">beta</button>
                 <button class="btn-latex" type="button" onclick="inserirLatex('\\pi')">pi</button>
                 <button class="btn-latex" type="button" onclick="inserirLatex('\\theta')">teta</button>
-               <button class="btn-latex" type="button" onclick="inserirLatex('\\lambda')">lambda</button>
-               <button class="btn-latex" type="button" onclick="inserirLatex('\\mu')">mi</button>
-               <button class="btn-latex" type="button" onclick="inserirLatex('\\sigma')">sigma</button>
-               <button class="btn-latex" type="button" onclick="inserirLatex('a \\neq b')">A diferente B</button>
-               <button class="btn-latex" type="button" onclick="inserirLatex('a \\le b')">A menor/igual B</button>
+                <button class="btn-latex" type="button" onclick="inserirLatex('\\lambda')">lambda</button>
+                <button class="btn-latex" type="button" onclick="inserirLatex('\\mu')">mi</button>
+                <button class="btn-latex" type="button" onclick="inserirLatex('\\sigma')">sigma</button>
+                <button class="btn-latex" type="button" onclick="inserirLatex('a \\neq b')">A diferente B</button>
+                <button class="btn-latex" type="button" onclick="inserirLatex('a \\le b')">A menor/igual B</button>
                 <button class="btn-latex" type="button" onclick="inserirLatex('a \\ge b')">A maior/igual B</button>
                 <button class="btn-latex" type="button" onclick="inserirLatex('\\pm')">mais ou menos</button>
                 <button class="btn-latex" type="button" onclick="inserirLatex('\\vec{v}')">Vetor</button>
                 <button class="btn-latex" type="button" onclick="inserirLatex('\\begin{bmatrix} a & b \\\\ c & d \\end{bmatrix}')">Matriz 2x2</button>
                 <button class="btn-latex" type="button" onclick="inserirLatex('\\begin{bmatrix} a & b & c \\\\ d & e & f \\\\ g & h & i \\end{bmatrix}')">Matriz 3x3</button>
                 <button class="btn-latex" type="button" onclick="inserirLatex('\\det(A)')">matriz determinante</button>
-                <button class="btn-latex" type="button" onclick="inserirLatex('\A^{-1}')">matriz inversa</button>
-                <button class="btn-latex" type="button" onclick="inserirLatex('\A^T')">matriz transposta </button>
+                <button class="btn-latex" type="button" onclick="inserirLatex('A^{-1}')">matriz inversa</button>
+                <button class="btn-latex" type="button" onclick="inserirLatex('A^T')">matriz transposta </button>
                 <button class="btn-latex" type="button" onclick="inserirLatex('a\\approx b')">a~b</button>
                 <button class="btn-latex" type="button" onclick="inserirLatex('\\models')">semântica</button>
                 <button class="btn-latex" type="button" onclick="inserirLatex('\\vdash')">sintática</button>
@@ -445,9 +449,8 @@
                 <button class="btn-latex" type="button" onclick="inserirLatex('\\textcolor{blue}{palavra}')">texto azul</button>
                 <button class="btn-latex" type="button" onclick="inserirLatex('\\textcolor{red}{palavra}')">texto vermelho</button>
                 <button class="btn-latex" type="button" onclick="inserirLatex('\\textcolor{green}{palavra}')">texto verde</button>
-              </div>
-              
-            </div>
+             </div>
+            </div> 
 
             <div id="secaoMultiplaEscolha" style="display:none; border: 1px solid #2b6cb0; padding: 12px; border-radius: 6px; margin-bottom: 12px; background: #edf2f7;">
               <strong style="color: #1b365d;">Alternativas:</strong>
@@ -482,13 +485,10 @@
             </div>
 
             <div id="secaoGabaritoTexto">
-              <label for="gabarito">Gabarito / Resposta (Opcional)</label>
-              <textarea id="gabarito" placeholder="Digite a resposta, solução ou observação para consulta. Ex.: x = $\frac{10}{2}$ ou $x^2 + 3x - 4 = 0$." oninput="atualizarPreviewGabarito()"></textarea>
-              <small style="display:block;color:#666;margin-top:-8px;margin-bottom:8px;">Use este campo para salvar a resposta ou uma explicação. Ela poderá ser visualizada no editor, sem aparecer na folha da prova.</small>
-              <div id="previewGabarito" style="display:none;border:1px dashed #2b6cb0;background:#f8fafc;border-radius:6px;padding:10px;margin-bottom:10px;">
-                <strong style="display:block;color:#1b365d;margin-bottom:6px;">Pré-visualização da resposta:</strong>
-                <div id="previewGabaritoConteudo"></div>
-              </div>
+              <label for="gabarito">Gabarito (Opcional)</label>
+              <textarea id="gabarito" placeholder="Digite a resposta esperada ou solução..." oninput="atualizarPreviewGabarito()"></textarea>
+              <span style="font-size: 8.5pt; font-weight: bold; color: #1b365d;">Pré-visualização do Gabarito:</span>
+              <div id="latexPreviewGabarito" class="latex-preview-box"></div>
             </div>
 
             <div id="secaoLinhas">
@@ -515,7 +515,7 @@
             </div>
           </div>
         </div>
-      </div>
+      </div>"
 
       <!-- CARD QUESTÕES ADICIONADAS -->
       <div class="card">
@@ -572,7 +572,6 @@
       if (!texto) return '';
       let html = texto;
 
-      // Processa equações em bloco $$...$$
       html = html.replace(/\$\$(.*?)\$\$/g, function(match, expr) {
         try {
           return katex.renderToString(expr, { displayMode: true, throwOnError: false });
@@ -581,7 +580,6 @@
         }
       });
 
-      // Processa equações inline $...$
       html = html.replace(/\$(.*?)\$/g, function(match, expr) {
         try {
           return katex.renderToString(expr, { displayMode: false, throwOnError: false });
@@ -592,11 +590,13 @@
 
       return html;
     }
+
     function alternarPainelLatex() {
       const painel = document.getElementById("painelLatex");
       painel.style.display = (painel.style.display === "none" || painel.style.display === "") ? "block" : "none";
       if (painel.style.display === "block") {
         atualizarPreviewLatex();
+        atualizarPreviewGabarito();
       }
     }
 
@@ -617,6 +617,14 @@
     function atualizarPreviewLatex() {
       const texto = document.getElementById("enunciado").value;
       const preview = document.getElementById("latexPreview");
+      if (preview) {
+        preview.innerHTML = formatarTextoLatex(texto);
+      }
+    }
+
+    function atualizarPreviewGabarito() {
+      const texto = document.getElementById("gabarito").value;
+      const preview = document.getElementById("latexPreviewGabarito");
       if (preview) {
         preview.innerHTML = formatarTextoLatex(texto);
       }
@@ -651,7 +659,6 @@
       document.getElementById("menuPrincipal").style.display = "none";
       document.getElementById("editor").style.display = "block";
     }
-
     function voltarMenu() {
       if (questaoEmEdicaoId !== null) {
         cancelarEdicao();
@@ -722,7 +729,6 @@
       };
       reader.readAsDataURL(file);
     }
-
     function atualizarPreviewLogoInstituicao() {
       const logo = localStorage.getItem("logoInstituicao") || "";
       const box = document.getElementById("previewLogoInstituicao");
@@ -752,9 +758,7 @@
       document.getElementById("secaoMultiplaEscolha").style.display = tipo === "multipla" ? "block" : "none";
       document.getElementById("secaoCertoErrado").style.display = tipo === "ce" ? "block" : "none";
       document.getElementById("secaoVerdadeiroFalso").style.display = tipo === "vf" ? "block" : "none";
-      // O gabarito geral fica disponível para TODOS os tipos e é salvo apenas no editor.
-      // Ele nunca é inserido na folha de impressão.
-      document.getElementById("secaoGabaritoTexto").style.display = "block";
+      document.getElementById("secaoGabaritoTexto").style.display = tipo === "dissertativa" ? "block" : "none";
       document.getElementById("secaoLinhas").style.display = tipo === "dissertativa" ? "block" : "none";
     }
 
@@ -764,21 +768,13 @@
       let html = `<div class='questao-titulo'>${prefixoTitulo}</div><p>${enunciadoFormatado}</p>`;
 
       if (q.tipo === "multipla") {
-        const alternativas = [
-          ['a', q.altA],
-          ['b', q.altB],
-          ['c', q.altC],
-          ['d', q.altD],
-          ['e', q.altE]
-        ].filter(([letra, texto]) => String(texto || '').trim() !== '');
-
-        if (alternativas.length > 0) {
-          html += `<div class="alternativas-lista">`;
-          alternativas.forEach(([letra, texto]) => {
-            html += `<div class="alternativa-item">${letra}) ( &nbsp; ) ${formatarTextoLatex(texto)}</div>`;
-          });
-          html += `</div>`;
-        }
+        html += `<div class="alternativas-lista">`;
+        html += `<div class="alternativa-item">a) ( &nbsp; ) ${formatarTextoLatex(q.altA || '')}</div>`;
+        html += `<div class="alternativa-item">b) ( &nbsp; ) ${formatarTextoLatex(q.altB || '')}</div>`;
+        html += `<div class="alternativa-item">c) ( &nbsp; ) ${formatarTextoLatex(q.altC || '')}</div>`;
+        html += `<div class="alternativa-item">d) ( &nbsp; ) ${formatarTextoLatex(q.altD || '')}</div>`;
+        html += `<div class="alternativa-item">e) ( &nbsp; ) ${formatarTextoLatex(q.altE || '')}</div>`;
+        html += `</div>`;
       } else if (q.tipo === "ce") {
         html += "<p>CERTO ( ) &nbsp;&nbsp; ERRADO ( )</p>";
       } else if (q.tipo === "vf") {
@@ -798,12 +794,12 @@
 
       return html;
     }
+
     function adicionarOuSalvarQuestao() {
       let titulo = document.getElementById("titulo").value.trim();
       let enunciado = document.getElementById("enunciado").value;
       let tipo = document.getElementById("tipo").value;
-      let gabaritoTexto = document.getElementById("gabarito").value.trim();
-      let gabarito = gabaritoTexto;
+      let gabarito = document.getElementById("gabarito").value;
       let espaco = document.getElementById("espaco").value;
       let calculo = document.getElementById("calculo").checked;
 
@@ -822,7 +818,7 @@
 
       let dadosQuestao = {
         id: questaoEmEdicaoId !== null ? questaoEmEdicaoId : Date.now(),
-        titulo, enunciado, tipo, gabarito, gabaritoTexto, espaco, calculo,
+        titulo, enunciado, tipo, gabarito, espaco, calculo,
         altA, altB, altC, altD, altE, corretaMultipla, respostaCE, respostaVF
       };
 
@@ -847,8 +843,7 @@
       document.getElementById("titulo").value = q.titulo || "";
       document.getElementById("enunciado").value = q.enunciado || "";
       document.getElementById("tipo").value = q.tipo || "dissertativa";
-      document.getElementById("gabarito").value = q.gabaritoTexto || q.gabarito || "";
-      atualizarPreviewGabarito();
+      document.getElementById("gabarito").value = q.gabarito || "";
       document.getElementById("espaco").value = q.espaco || "0";
       document.getElementById("calculo").checked = !!q.calculo;
       document.getElementById("altA").value = q.altA || "";
@@ -862,6 +857,7 @@
 
       alternarCamposTipo();
       atualizarPreviewLatex();
+      atualizarPreviewGabarito();
 
       let card = document.getElementById("novaQuestao");
       if (card.style.display === "none") alternarCard('novaQuestao','tituloQuestao','➕ Nova Questão / Edição');
@@ -891,7 +887,6 @@
       document.getElementById("enunciado").value = "";
       document.getElementById("tipo").value = "dissertativa";
       document.getElementById("gabarito").value = "";
-      atualizarPreviewGabarito();
       document.getElementById("espaco").value = "0";
       document.getElementById("calculo").checked = false;
       document.getElementById("altA").value = "";
@@ -905,9 +900,21 @@
       
       const preview = document.getElementById("latexPreview");
       if (preview) preview.innerHTML = "";
+      const previewGab = document.getElementById("latexPreviewGabarito");
+      if (previewGab) previewGab.innerHTML = "";
       
       alternarCamposTipo();
     }
+
+    /* ALTERNAR VISIBILIDADE DO GABARITO NA LISTA */
+    function alternarGabaritoLista(id) {
+      let box = document.getElementById("gabarito-box-" + id);
+      if (box) {
+        box.style.display = (box.style.display === "none" || box.style.display === "") ? "block" : "none";
+      }
+    }
+
+    /* RENDERIZAÇÃO DA LISTA NO EDITOR */
     function renderizarListaEditor() {
       let lista = document.getElementById("listaQuestoes");
       if (questoesArray.length === 0) {
@@ -919,23 +926,29 @@
         let item = document.createElement("div");
         item.style.borderBottom = "1px solid #ddd";
         item.style.padding = "10px 0";
+
+        let textoGabarito = q.gabarito ? formatarTextoLatex(q.gabarito) : "<em style='color:#888;'>Gabarito não informado.</em>";
+
         item.innerHTML = `
-          <div style="display:flex;justify-content:space-between;align-items:center;">
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
             <div>
               <strong>Questão ${idx + 1}</strong> <small style="color:#666;">(${q.tipo})</small><br>
               <small style="color:#555;">${q.enunciado ? q.enunciado.substring(0, 40) : ''}...</small>
             </div>
-            <div style="display:flex;flex-wrap:wrap;gap:5px;justify-content:flex-end;">
-              <button class="btn-gabarito" onclick="visualizarGabarito(${q.id})">👁 Gabarito</button>
+            <div>
+              <button class="btn-gabarito-item" onclick="alternarGabaritoLista(${q.id})">👁️ Gabarito</button>
               <button class="btn-edit" onclick="editarQuestao(${q.id})">✏️ Editar</button>
               <button class="btn-delete" onclick="excluirQuestao(${q.id})">🗑 Excluir</button>
             </div>
           </div>
+          <div id="gabarito-box-${q.id}" style="display:none; margin-top:10px; padding:10px; background:#edf2f7; border-left:4px solid #2b6cb0; border-radius:4px; font-size:9pt;">
+            <strong style="color:#1b365d;">Resposta / Gabarito:</strong>
+            <div style="margin-top:4px;">${textoGabarito}</div>
+          </div>
         `;
         lista.appendChild(item);
       });
-    }
-
+  }
     function excluirQuestao(id) {
       if (confirm("Deseja realmente excluir esta questão da prova?")) {
         if (questaoEmEdicaoId === id) cancelarEdicao();
@@ -1014,7 +1027,6 @@
         lista.appendChild(div);
       });
     }
-
     function carregarProva(id) {
       let provasSalvas = JSON.parse(localStorage.getItem("provasSalvas") || "[]");
       let prova = provasSalvas.find(p => p.id === id);
@@ -1060,56 +1072,46 @@
       localStorage.setItem("bancoQuestoes", JSON.stringify(banco));
     }
 
-    /* RENDERIZAÇÃO DO BANCO COM ORDENAÇÃO ALFABÉTICA */
-function renderizarBancoQuestoes() {
-  let lista = document.getElementById("listaBancoQuestoes");
-  let banco = JSON.parse(localStorage.getItem("bancoQuestoes") || "[]");
+    /* RENDERIZAÇÃO DO BANCO */
+    function renderizarBancoQuestoes() {
+      let lista = document.getElementById("listaBancoQuestoes");
+      let banco = JSON.parse(localStorage.getItem("bancoQuestoes") || "[]");
 
-  if (banco.length === 0) {
-    lista.innerHTML = "<p style='text-align:center; color:#666;'>Nenhuma questão salva no banco.</p>";
-    return;
-  }
-
-  // Ordena alfabeticamente pelo título (considerando 'Questão' para títulos vazios)
-  banco.sort((a, b) => {
-    let tituloA = (a.titulo && a.titulo.trim() !== '') ? a.titulo.trim() : 'Questão';
-    let tituloB = (b.titulo && b.titulo.trim() !== '') ? b.titulo.trim() : 'Questão';
-    return tituloA.localeCompare(tituloB, 'pt-BR', { sensitivity: 'base' });
-  });
-
-  lista.innerHTML = "";
-  banco.forEach(q => {
-    let tituloExibicao = (q.titulo && q.titulo.trim() !== '') ? q.titulo.trim() : 'Questão';
-
-    let div = document.createElement("div");
-    div.className = "item-salvo";
-    div.innerHTML = `
-      <div style="display:flex; align-items:center; gap:12px; flex:1;">
-        <input type="checkbox" class="checkQuestao" value="${q.id}" style="transform:scale(1.3); margin-right:5px; cursor:pointer;">
-        <div>
-          <strong>${tituloExibicao}</strong> - <small>${q.tipo}</small><br>
-          <small style="color:#666;">
-            ${q.enunciado ? q.enunciado.substring(0,50) : ""}...
-          </small>
-        </div>
-      </div>
-      <div>
-        <button class="btn-delete" onclick="excluirQuestaoBanco(${q.id})">🗑 Excluir</button>
-      </div>
-    `;
-    lista.appendChild(div);
-
-    let check = div.querySelector(".checkQuestao");
-    check.addEventListener("change", function() {
-      if (this.checked) {
-        div.classList.add("selecionado");
-      } else {
-        div.classList.remove("selecionado");
+      if (banco.length === 0) {
+        lista.innerHTML = "<p style='text-align:center; color:#666;'>Nenhuma questão salva no banco.</p>";
+        return;
       }
-    });
-  });
+
+      lista.innerHTML = "";
+      banco.forEach(q => {
+        let div = document.createElement("div");
+        div.className = "item-salvo";
+        div.innerHTML = `
+          <div style="display:flex; align-items:center; gap:12px; flex:1;">
+            <input type="checkbox" class="checkQuestao" value="${q.id}" style="transform:scale(1.3); margin-right:5px; cursor:pointer;">
+            <div>
+              <strong>${q.titulo || 'Questão'}</strong> - <small>${q.tipo}</small><br>
+              <small style="color:#666;">
+                ${q.enunciado ? q.enunciado.substring(0,50) : ""}...
+              </small>
+            </div>
+          </div>
+          <div>
+            <button class="btn-delete" onclick="excluirQuestaoBanco(${q.id})">🗑 Excluir</button>
+          </div>
+        `;
+        lista.appendChild(div);
+
+        let check = div.querySelector(".checkQuestao");
+        check.addEventListener("change", function() {
+          if (this.checked) {
+            div.classList.add("selecionado");
+          } else {
+            div.classList.remove("selecionado");
+          }
+        });
+      });
     }
-    
 
     /* FUNÇÕES EM LOTE PARA O BANCO DE QUESTÕES */
     function selecionarTodasQuestoes() {
@@ -1154,6 +1156,7 @@ function renderizarBancoQuestoes() {
 
       alert(marcadas.length + " questão(ões) importada(s) com sucesso!");
     }
+
     function excluirSelecionadas() {
       let selecionadas = document.querySelectorAll(".checkQuestao:checked");
 
@@ -1175,6 +1178,7 @@ function renderizarBancoQuestoes() {
       renderizarBancoQuestoes();
       alert("Questões excluídas com sucesso!");
     }
+
     function excluirQuestaoBanco(id) {
       if (confirm("Remover esta questão do banco de dados local?")) {
         let banco = JSON.parse(localStorage.getItem("bancoQuestoes") || "[]");
@@ -1231,11 +1235,7 @@ function renderizarBancoQuestoes() {
       }
     }
 
-    /* PAGINAÇÃO COM NUMERAÇÃO AUTOMÁTICA
-       - duas colunas independentes por folha
-       - cada questão recebe seu número pelo índice original
-       - nenhuma questão é descartada quando uma coluna fica cheia
-    */
+    /* PAGINAÇÃO COM NUMERAÇÃO AUTOMÁTICA */
     function paginarDocumento() {
       const containerDoc = document.getElementById('documento-paginado');
       containerDoc.innerHTML = '';
@@ -1268,7 +1268,6 @@ function renderizarBancoQuestoes() {
       questoesArray.forEach((q, idx) => {
         const questaoElem = document.createElement('div');
         questaoElem.className = 'questao';
-        /* idx + 1 garante numeração contínua, inclusive entre folhas */
         questaoElem.innerHTML = gerarHtmlQuestao(q, idx + 1);
 
         let inserida = false;
@@ -1277,12 +1276,9 @@ function renderizarBancoQuestoes() {
           const coluna = colunas[colunaAtual];
           coluna.appendChild(questaoElem);
 
-          /* O clientHeight da coluna é a altura física realmente disponível na folha. */
           const estourou = coluna.scrollHeight > coluna.clientHeight + 1;
 
           if (!estourou || coluna.children.length === 1) {
-            /* Se a questão sozinha for maior que uma coluna, ela permanece inteira para
-               não ser perdida; a próxima questão seguirá para a próxima coluna/folha. */
             inserida = true;
           } else {
             coluna.removeChild(questaoElem);
@@ -1299,8 +1295,7 @@ function renderizarBancoQuestoes() {
 
       atualizarNavegacao();
       ajustarEscolaMobile();
-    }
-
+  }
     function criarEstruturaPagina(numPagina) {
       const page = document.createElement('div');
       page.className = 'a4-page';
@@ -1441,288 +1436,55 @@ function renderizarBancoQuestoes() {
       document.getElementById("editor").style.display = "block";
     }
 
-    /* GERAÇÃO DIRETA DE PDF
-       Cada .a4-page é capturada individualmente e inserida como UMA página
-       no PDF. Isso evita as páginas em branco causadas pela combinação de
-       page-break CSS + pagebreak do html2pdf.
-    */
-    function carregarScriptPDF(src) {
-      return new Promise((resolve, reject) => {
-        const existente = document.querySelector('script[src="' + src + '"]');
-        if (existente) {
-          if (existente.dataset.carregado === "true") { resolve(); return; }
-          existente.addEventListener("load", () => resolve(), { once: true });
-          existente.addEventListener("error", () => reject(new Error("Falha ao carregar " + src)), { once: true });
-          return;
-        }
-        const script = document.createElement("script");
-        script.src = src;
-        script.async = true;
-        script.onload = () => { script.dataset.carregado = "true"; resolve(); };
-        script.onerror = () => reject(new Error("Falha ao carregar " + src));
-        document.head.appendChild(script);
-      });
-    }
-
-    async function garantirBibliotecasPDF() {
-      /* html2pdf.bundle normalmente traz html2canvas e jsPDF juntos.
-         O código também possui fallback para quando o CDN principal demora
-         ou falha no celular. */
-      if (typeof window.html2pdf === "undefined") {
-        const fontes = [
-          "https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js",
-          "https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js"
-        ];
-        let carregou = false;
-        for (const src of fontes) {
-          try {
-            await carregarScriptPDF(src);
-            if (typeof window.html2pdf !== "undefined") { carregou = true; break; }
-          } catch (e) {}
-        }
-        if (!carregou) throw new Error("html2pdf não carregado");
-      }
-
-      if (typeof window.html2canvas === "undefined") {
-        const fontesCanvas = [
-          "https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js",
-          "https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"
-        ];
-        let carregou = false;
-        for (const src of fontesCanvas) {
-          try {
-            await carregarScriptPDF(src);
-            if (typeof window.html2canvas !== "undefined") { carregou = true; break; }
-          } catch (e) {}
-        }
-        if (!carregou) throw new Error("html2canvas não carregado");
-      }
-
-      if (typeof window.jspdf === "undefined" && typeof window.jsPDF === "undefined") {
-        const fontesJsPDF = [
-          "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js",
-          "https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"
-        ];
-        let carregou = false;
-        for (const src of fontesJsPDF) {
-          try {
-            await carregarScriptPDF(src);
-            if (typeof window.jspdf !== "undefined" || typeof window.jsPDF !== "undefined") { carregou = true; break; }
-          } catch (e) {}
-        }
-        if (!carregou) throw new Error("jsPDF não carregado");
-      }
-    }
-
-    async function gerarPDFDireto() {
+    /* GERAÇÃO DIRETA DE PDF */
+    function gerarPDFDireto() {
       const elemento = document.getElementById("documento-paginado");
       const btn = document.getElementById("btnDownloadPDF");
-      if (!elemento || !btn) return;
+      if (!elemento || !window.html2pdf) {
+        alert("A biblioteca de PDF ainda não foi carregada. Tente novamente.");
+        return;
+      }
 
-      btn.innerText = "⏳ Carregando PDF...";
+      btn.innerText = "⏳ Gerando PDF...";
       btn.disabled = true;
 
-      try {
-        await garantirBibliotecasPDF();
-      } catch (erroBiblioteca) {
-        console.error("Bibliotecas PDF:", erroBiblioteca);
-        alert("Não foi possível carregar a biblioteca do PDF. Verifique a conexão com a internet e tente novamente.");
-        btn.innerText = "📥 Baixar PDF";
-        btn.disabled = false;
-        return;
-      }
-
-      const paginas = Array.from(elemento.querySelectorAll(".a4-page"));
-      if (!paginas.length) {
-        alert("Não há folhas para gerar o PDF.");
-        btn.innerText = "📥 Baixar PDF";
-        btn.disabled = false;
-        return;
-      }
-
-      /* O html2pdf.bundle disponibiliza o jsPDF em window.jspdf.jsPDF.
-         O segundo caminho mantém compatibilidade com versões que expõem
-         jsPDF diretamente em window. */
-      const JsPDF = (window.jspdf && window.jspdf.jsPDF) || window.jsPDF;
-      if (!JsPDF) {
-        alert("Não foi possível carregar o gerador de PDF. Tente novamente.");
-        btn.innerText = "📥 Baixar PDF";
-        btn.disabled = false;
-        return;
-      }
+      const paginas = document.querySelectorAll(".a4-page");
+      paginas.forEach(p => { p.style.transform = "none"; });
 
       elemento.classList.add('modo-pdf');
 
-      try {
-        /* Remove transformações de visualização apenas durante a captura. */
-        paginas.forEach(pagina => {
-          pagina.style.transform = "none";
-          pagina.style.margin = "0";
-        });
+      const titulo = document.getElementById("tituloProva").value.trim() || "prova";
+      const opcoes = {
+        margin: 0,
+        filename: `${titulo.toLowerCase().replace(/[^a-z0-9áéíóúãõçüñ ]/gi, '').trim().replace(/\s+/g, '_') || 'prova'}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: {
+          scale: 2,
+          useCORS: true,
+          allowTaint: true,
+          logging: false,
+          backgroundColor: '#ffffff',
+          scrollX: 0,
+          scrollY: 0
+        },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait', compress: true },
+        pagebreak: { mode: ['css', 'legacy'], before: '.page-wrapper:not(:first-child)' }
+      };
 
-        /* Aguarda fontes e imagens do cabeçalho/logo terminarem de carregar. */
-        if (document.fonts && document.fonts.ready) {
-          await document.fonts.ready;
-        }
-        const imagens = Array.from(elemento.querySelectorAll('img'));
-        await Promise.all(imagens.map(img => {
-          if (img.complete) return Promise.resolve();
-          return new Promise(resolve => {
-            img.onload = resolve;
-            img.onerror = resolve;
-          });
-        }));
-
-        const titulo = document.getElementById("tituloProva").value.trim() || "prova";
-        const nomeArquivo = `${titulo.toLowerCase().replace(/[^a-z0-9áéíóúãõçüñ ]/gi, '').trim().replace(/\s+/g, '_') || 'prova'}.pdf`;
-
-        const pdf = new JsPDF({
-          unit: 'mm',
-          format: 'a4',
-          orientation: 'portrait',
-          compress: true
-        });
-
-        for (let i = 0; i < paginas.length; i++) {
-          /* Captura somente a folha atual. Não captura o container inteiro. */
-          const canvas = await window.html2canvas(paginas[i], {
-            scale: 2,
-            useCORS: true,
-            allowTaint: true,
-            logging: false,
-            backgroundColor: '#ffffff',
-            scrollX: 0,
-            scrollY: 0,
-            width: paginas[i].offsetWidth,
-            height: paginas[i].offsetHeight,
-            windowWidth: document.documentElement.clientWidth,
-            windowHeight: document.documentElement.clientHeight
-          });
-
-          const imgData = canvas.toDataURL('image/jpeg', 0.96);
-
-          if (i > 0) {
-            pdf.addPage('a4', 'portrait');
-          }
-
-          /* Uma captura = uma página A4. Assim, não existem páginas vazias
-             entre as folhas preenchidas. */
-          pdf.addImage(imgData, 'JPEG', 0, 0, 210, 297, undefined, 'FAST');
-        }
-
-        pdf.save(nomeArquivo);
-
+      html2pdf().set(opcoes).from(elemento).save().then(function() {
         elemento.classList.remove('modo-pdf');
         btn.innerText = "📥 Baixar PDF";
         btn.disabled = false;
         ajustarEscolaMobile();
-      } catch (err) {
-        console.error('Erro ao gerar PDF:', err);
+      }).catch(err => {
+        console.error(err);
         elemento.classList.remove('modo-pdf');
-        btn.innerText = "📥 Baixar PDF";
-        btn.disabled = false;
-        ajustarEscolaMobile();
         alert("Ocorreu um erro ao gerar o PDF. Tente novamente.");
-      }
-    }
-
-    function escaparHtml(texto) {
-      return String(texto || '').replace(/[&<>'"]/g, function(c) {
-        return {'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c];
+        btn.innerText = "📥 Baixar PDF";
+        btn.disabled = false;
+        ajustarEscolaMobile();
       });
     }
-
-    function obterRespostaSalva(q) {
-      if (!q) return 'Nenhum gabarito informado.';
-
-      const partes = [];
-      if (q.tipo === 'multipla' && q.corretaMultipla) {
-        partes.push(`<strong>Alternativa correta:</strong> ${escaparHtml(q.corretaMultipla)}`);
-      } else if (q.tipo === 'ce' && q.respostaCE) {
-        partes.push(`<strong>Resposta:</strong> ${escaparHtml(q.respostaCE)}`);
-      } else if (q.tipo === 'vf' && q.respostaVF) {
-        partes.push(`<strong>Resposta:</strong> ${escaparHtml(q.respostaVF)}`);
-      }
-
-      const texto = q.gabaritoTexto || '';
-      if (texto.trim()) {
-        partes.push(`<strong>Gabarito / solução:</strong><br>${formatarTextoGabarito(texto)}`);
-      } else if (partes.length === 0 && q.gabarito) {
-        partes.push(`<strong>Gabarito:</strong> ${escaparHtml(q.gabarito)}`);
-      }
-
-      return partes.length ? partes.join('<hr style="border:0;border-top:1px solid #cbd5e0;margin:10px 0;">') : 'Nenhum gabarito informado.';
-    }
-
-    // Formata o gabarito com suporte a LaTeX, sem expor o texto digitado como HTML.
-    function formatarTextoGabarito(texto) {
-      if (!texto) return '';
-      const partes = [];
-      let pos = 0;
-      const regex = /\$\$(.*?)\$\$|\$(.*?)\$/gs;
-      let match;
-
-      while ((match = regex.exec(texto)) !== null) {
-        if (match.index > pos) {
-          partes.push(escaparHtml(texto.slice(pos, match.index)).replace(/\n/g, '<br>'));
-        }
-
-        const expr = match[1] !== undefined ? match[1] : match[2];
-        const displayMode = match[1] !== undefined;
-        try {
-          partes.push(katex.renderToString(expr, {
-            displayMode,
-            throwOnError: false
-          }));
-        } catch (e) {
-          partes.push(escaparHtml(match[0]));
-        }
-        pos = regex.lastIndex;
-      }
-
-      if (pos < texto.length) {
-        partes.push(escaparHtml(texto.slice(pos)).replace(/\n/g, '<br>'));
-      }
-
-      return partes.join('');
-    }
-
-    function atualizarPreviewGabarito() {
-      const campo = document.getElementById('gabarito');
-      const preview = document.getElementById('previewGabarito');
-      const conteudo = document.getElementById('previewGabaritoConteudo');
-      if (!campo || !preview || !conteudo) return;
-
-      const texto = campo.value.trim();
-      if (!texto) {
-        preview.style.display = 'none';
-        conteudo.innerHTML = '';
-        return;
-      }
-
-      conteudo.innerHTML = formatarTextoGabarito(texto);
-      preview.style.display = 'block';
-    }
-
-     function visualizarGabarito(id) {
-      const q = questoesArray.find(item => item.id === id);
-      if (!q) return;
-      const modal = document.getElementById('modalGabarito');
-      const titulo = document.getElementById('modalGabaritoTitulo');
-      const corpo = document.getElementById('modalGabaritoCorpo');
-      titulo.textContent = `Gabarito — Questão ${questoesArray.indexOf(q) + 1}`;
-      corpo.innerHTML = `<div class="resposta-salva">${obterRespostaSalva(q)}</div>`;
-      modal.style.display = 'flex';
-    }
-
-    function fecharModalGabarito() {
-      const modal = document.getElementById('modalGabarito');
-      if (modal) modal.style.display = 'none';
-    }
-
-    document.addEventListener('keydown', function(e) {
-      if (e.key === 'Escape') fecharModalGabarito();
-    });
 
     window.addEventListener('scroll', function() {
       const vis = document.getElementById("visualizacaoProva");
@@ -1748,4 +1510,4 @@ function renderizarBancoQuestoes() {
     window.onresize = ajustarEscolaMobile;
   </script>
 </body>
-</html> 
+</html>
