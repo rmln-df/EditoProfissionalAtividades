@@ -367,6 +367,11 @@
             <button class="btn" type="button" onclick="alternarPainelLatex()" style="background:#2b6cb0; color:white; width:100%; padding:8px; margin-bottom:8px;">
               ∑ Inserir Funções Matemática (LaTeX)
             </button>
+            
+            <div style="margin-top:10px;">
+                <span style="font-size: 8.5pt; font-weight: bold; color: #1b365d;">Pré-visualização do Enunciado:</span>
+                <div id="latexPreview" class="latex-preview-box"></div>
+            </div>
 
             <div id="painelLatex" class="latex-panel" style="display:none;">
               <span style="font-size: 8.5pt; font-weight: bold; color: #1b365d;">Clique no símbolo para inserir no Enunciado:</span>
@@ -441,10 +446,7 @@
                 <button class="btn-latex" type="button" onclick="inserirLatex('\\textcolor{red}{palavra}')">texto vermelho</button>
                 <button class="btn-latex" type="button" onclick="inserirLatex('\\textcolor{green}{palavra}')">texto verde</button>
               </div>
-              <div style="margin-top:10px;">
-                <span style="font-size: 8.5pt; font-weight: bold; color: #1b365d;">Pré-visualização do Enunciado:</span>
-                <div id="latexPreview" class="latex-preview-box"></div>
-              </div>
+              
             </div>
 
             <div id="secaoMultiplaEscolha" style="display:none; border: 1px solid #2b6cb0; padding: 12px; border-radius: 6px; margin-bottom: 12px; background: #edf2f7;">
